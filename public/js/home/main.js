@@ -18,7 +18,7 @@ $(document).ready(function () {
   function onScanSuccess(decodedText, decodedResult) {
     // handle the scanned code as you like, for example:
     console.log(`Code matched = ${decodedText}`, decodedResult);
-    document.getElementById("qrCodeData").innerHTML = decodedText;
+    document.getElementById("qrCodeData").value = decodedText;
   }
 
   function onScanFailure(error) {
@@ -43,4 +43,36 @@ $(document).ready(function () {
   //     qrbox: 250,
   //   });
   //   html5QrcodeScanner.render(onScanSuccess);
+
+  document.getElementById("submitData").addEventListener("click", function () {
+    //get the data from the form
+    let teamName = document.getElementById("teamName").value || "";
+    let teamEmail = document.getElementById("teamEmail").value || "";
+    let teamPassword = document.getElementById("teamPassword").value || "";
+    let qrCodeData = document.getElementById("qrCodeData").value || "";
+
+    $.ajax({
+      type: "POST",
+      url: "/email",
+      data: {
+        teamName: teamName,
+        teamEmail: teamEmail,
+        teamPassword: teamPassword,
+        qrCodeData: qrCodeData,
+      },
+      success: function (msg) {
+        if (msg == "false") {
+        } else {
+          // $("#success-saved").removeAttr("hidden");
+          // $("#success-saved").show("fade");
+          // document.getElementById("alert-successsaveClose").onclick =
+          //   function () {
+          //     document
+          //       .getElementById("success-saved")
+          //       .setAttribute("hidden", "true");
+          //   };
+        }
+      },
+    });
+  });
 });

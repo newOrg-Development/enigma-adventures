@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const https = require("https");
 const exphbs = require("express-handlebars");
-
+const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const result = dotenv.config("./.env");
 const fs = require("fs");
@@ -11,7 +11,7 @@ console.log(`env is ${env}`);
 
 //app.engine("handlebars", engine());
 //code to use hbs instead of handlebars
-
+app.use(bodyParser.json({ limit: "10mb", extended: true }));
 app.engine(".hbs", exphbs.engine({ defaultLayout: "main", extname: ".hbs" }));
 app.set("port", process.env.PORT || 3000);
 //app.use(express.static(__dirname + "../public"));
@@ -20,12 +20,19 @@ app.set("view engine", ".hbs");
 //app.set("views", path.resolve(__dirname, "./views"));
 //app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static("public"));
+app.use(bodyParser.json({ limit: "10mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
+//app.use(cookieParser());
 
 const mainHead = module.require("./views/custom/mainHead.hbs");
+
+const emailRouter = require("./routes/email");
 
 app.get("/", (req, res) => {
   res.render("home", { customHead: mainHead });
 });
+
+app.use("/email", emailRouter);
 
 if (process.env.NODE_ENV === "development") {
   console.log("development mode");
