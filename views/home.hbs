@@ -1,9 +1,29 @@
 <div class="container-fluid">
 
+  <form>
+    <div class="mb-3 mt-5">
+      <label for="teamName" class="form-label">Team Name</label>
+      <input type="text" class="form-control" id="teamName" />
+    </div>
+    <div class="mb-3">
+      <label for="teamEmail" class="form-label">Email Address</label>
+      <input
+        type="email"
+        class="form-control"
+        id="teamEmail"
+        aria-describedby="emailHelp"
+      />
+
+    </div>
+    <div class="mb-3">
+      <label for="gamePassword" class="form-label">Password</label>
+      <input type="password" class="form-control" id="gamePassword" />
+    </div>
+  </form>
+
   <div class="d-grid gap-2 mt-5">
     <button class="btn btn-primary" type="button" id="showScanner">Show/Hide
       Scanner</button>
-
   </div>
 
   <div class="mx-auto mt-3" style="width: 80%; display:none" id="scanner"></div>
