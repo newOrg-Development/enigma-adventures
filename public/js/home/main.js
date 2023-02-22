@@ -4,10 +4,21 @@ $(document).ready(function () {
   // goes inside this function
 
   console.log("main.js");
+
+  document.getElementById("showScanner").addEventListener("click", function () {
+    //toggle scanner display on and off
+    let x = document.getElementById("scanner");
+    if (x.style.display === "none") {
+      x.style.display = "block";
+    } else {
+      x.style.display = "none";
+    }
+  });
+
   function onScanSuccess(decodedText, decodedResult) {
     // handle the scanned code as you like, for example:
     console.log(`Code matched = ${decodedText}`, decodedResult);
-    document.getElementById("qrCode").innerHTML = decodedText;
+    document.getElementById("qrCodeData").innerHTML = decodedText;
   }
 
   function onScanFailure(error) {
@@ -17,7 +28,7 @@ $(document).ready(function () {
   }
 
   let html5QrcodeScanner = new Html5QrcodeScanner(
-    "reader",
+    "scanner",
     { fps: 10, qrbox: { width: 250, height: 250 } },
     /* verbose= */ false
   );
