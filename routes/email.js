@@ -5,7 +5,7 @@ const router = express.Router();
 router.post("/", function (req, res, next) {
   console.log("email route" + req.body.teamName);
 
-  main(req.body).catch(console.error);
+  // main(req.body).catch(console.error);
 });
 
 ("use strict");
