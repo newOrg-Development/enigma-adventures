@@ -25,15 +25,26 @@ app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 //app.use(cookieParser());
 
 const mainHead = module.require("./views/custom/mainHead.hbs");
+const adminHead = module.require("./views/custom/adminHead.hbs");
 
 const emailRouter = require("./routes/email");
+const adminRouter = require("./routes/admin");
+
+app.use("/email", emailRouter);
+
+let gameread = fs.readFileSync("./gameData/gameData.txt");
+//gameread = JSON.parse(gameread);
+console.log("gameread: " + gameread);
 
 app.get("/", (req, res) => {
   res.render("home", { customHead: mainHead });
 });
 
-app.use("/email", emailRouter);
+app.get("/admin", (req, res) => {
+  res.render("admin", { customHead: adminHead, gameData: gameread });
+});
 
+app.use("/admin", adminRouter);
 if (process.env.NODE_ENV === "development") {
   console.log("development mode");
   options = {
