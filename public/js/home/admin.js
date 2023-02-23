@@ -215,5 +215,7 @@ $(document).ready(function () {
     let hint = gameDataParsed[gameNumberSelected - 1][0][0];
     console.log("hint: " + hint);
     document.getElementById("hint").value = hint;
+    document.getElementById("gameDataDiv").innerText =
+      JSON.stringify(gameDataParsed);
   }
 });
