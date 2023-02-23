@@ -13,10 +13,10 @@
     />
 
   </div>
-  <div class="mb-3">
+  {{! <div class="mb-3">
     <label for="teamPassword" class="form-label">Password</label>
     <input type="password" class="form-control" id="teamPassword" />
-  </div>
+  </div> }}
   <div class="mb-3">
     <label for="qrCodeData" class="form-label">Scanner Data</label>
     <input type="text" class="form-control" id="qrCodeData" value="hint" />
@@ -24,6 +24,10 @@
 </form>
 
 <div class="d-grid gap-2 mt-5">
+  <button class="btn btn-primary" type="button" id="signUp">Sign Up</button>
+</div>
+
+<div class="d-grid gap-2 mt-3">
   <button class="btn btn-primary" type="button" id="showScanner">Show/Hide
     Scanner</button>
 </div>

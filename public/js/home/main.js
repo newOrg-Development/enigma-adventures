@@ -24,10 +24,46 @@ $(document).ready(function () {
   );
   html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 
+  document.getElementById("signUp").addEventListener("click", function () {
+    let teamName = document.getElementById("teamName").value;
+    let teamEmail = document.getElementById("teamEmail").value;
+    // let teamPassword = document.getElementById("teamPassword").value;
+    let qrCodeData = document.getElementById("qrCodeData").value;
+
+    $.ajax({
+      type: "POST",
+      url: "/signUp",
+      data: {
+        teamName: teamName,
+        teamEmail: teamEmail,
+        //teamPassword: teamPassword,
+        qrCodeData: qrCodeData,
+        username: "user1",
+        password: "mypassword",
+      },
+      success: function (msg) {
+        if (msg == "false") {
+        } else {
+          console.log("msg: " + JSON.stringify(msg));
+          document.getElementById("logoutDiv").style.display = "block";
+
+          // $("#success-saved").removeAttr("hidden");
+          // $("#success-saved").show("fade");
+          // document.getElementById("alert-successsaveClose").onclick =
+          //   function () {
+          //     document
+          //       .getElementById("success-saved")
+          //       .setAttribute("hidden", "true");
+          //   };
+        }
+      },
+    });
+  });
+
   document.getElementById("submitData").addEventListener("click", function () {
     let teamName = document.getElementById("teamName").value || "";
     let teamEmail = document.getElementById("teamEmail").value || "";
-    let teamPassword = document.getElementById("teamPassword").value || "";
+    //let teamPassword = document.getElementById("teamPassword").value || "";
     let qrCodeData = document.getElementById("qrCodeData").value || "";
 
     if (qrCodeData == "hint") {
@@ -39,7 +75,7 @@ $(document).ready(function () {
         data: {
           teamName: teamName,
           teamEmail: teamEmail,
-          teamPassword: teamPassword,
+          //teamPassword: teamPassword,
           qrCodeData: qrCodeData,
         },
         success: function (msg) {
