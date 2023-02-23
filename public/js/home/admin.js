@@ -133,13 +133,7 @@ $(document).ready(function () {
   document.getElementById("addHint").addEventListener("click", function () {
     let gameNumber = document.getElementById("gameNumber").value;
     let puzzleNumber = document.getElementById("puzzleNumber").value;
-    // let hintNumber = document.getElementById("hintNumber").value;
-    // let hint = document.getElementById("hint").value;
-    // let hintDataTemp = [];
-    // hintDataTemp.push(gameNumber);
-    // hintDataTemp.push(puzzleNumber);
-    // hintDataTemp.push(hintNumber);
-    // hintDataTemp.push(hint);
+
     console.log(
       "hinter",
       gameDataParsed[gameNumber - 1][puzzleNumber - 1],
