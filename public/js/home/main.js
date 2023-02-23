@@ -45,7 +45,7 @@ $(document).ready(function () {
       });
     }
   }
-  updateHints();
+
   function onScanSuccess(decodedText, decodedResult) {
     document.getElementById("qrCodeData").value = decodedText;
 
@@ -85,7 +85,8 @@ $(document).ready(function () {
         } else {
           console.log("msg: " + JSON.stringify(msg));
           document.getElementById("logoutDiv").style.display = "block";
-          document.getElementById("session").innerText = JSON.stringify(msg);
+          document.getElementById("sessionData").innerText =
+            JSON.stringify(msg);
 
           //make a url out of the msg
 
@@ -111,13 +112,39 @@ $(document).ready(function () {
   });
 
   document.getElementById("submitData").addEventListener("click", function () {
-    let teamName = document.getElementById("teamName").value || "";
-    let teamEmail = document.getElementById("teamEmail").value || "";
+    // let teamName = document.getElementById("teamName").value;
+    // let teamEmail = document.getElementById("teamEmail").value;
     //let teamPassword = document.getElementById("teamPassword").value || "";
-    let qrCodeData = document.getElementById("qrCodeData").value || "";
+    let qrCodeData = document.getElementById("qrCodeData").value;
+    let session = document.getElementById("sessionData").innerText;
+    session = JSON.parse(session);
+    let uuid = session.uuid;
+    if (uuid == undefined) {
+      uuid = "";
+    }
 
-    if (qrCodeData == "hint") {
-      hinter();
+    if (qrCodeData == "hint" && uuid != "") {
+      //hinter();
+      $.ajax({
+        type: "POST",
+        url: "/updateHint",
+        data: {
+          uuid,
+        },
+        success: function (msg) {
+          if (msg == "false") {
+          } else {
+            // $("#success-saved").removeAttr("hidden");
+            // $("#success-saved").show("fade");
+            // document.getElementById("alert-successsaveClose").onclick =
+            //   function () {
+            //     document
+            //       .getElementById("success-saved")
+            //       .setAttribute("hidden", "true");
+            //   };
+          }
+        },
+      });
     } else if (qrCodeData == "new") {
       $.ajax({
         type: "POST",
