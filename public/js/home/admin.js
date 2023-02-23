@@ -40,6 +40,18 @@ $(document).ready(function () {
     puzzleNumberSelect.add(option);
   }
 
+  temperCounter = gameDataParsed[0][gameNumberSelected][0][0].length;
+  let hintNumberSelect = document.getElementById("hintNumber");
+  for (let i = 0; i < temperCounter; i++) {
+    let option = document.createElement("option");
+    option.text = i + 1;
+    option.value = i + 1;
+    hintNumberSelect.add(option);
+  }
+
+  let hint = gameDataParsed[0][0][0];
+  document.getElementById("hint").value = hint;
+
   document.getElementById("gameNumber").addEventListener("change", function () {
     // let gameDataParsed = JSON.parse(gameData);
     console.log(gameDataParsed);
