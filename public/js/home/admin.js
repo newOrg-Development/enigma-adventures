@@ -87,8 +87,45 @@ $(document).ready(function () {
     //get hint
     let hint = gameDataParsed[gameNumberSelected - 1][0][0];
     console.log("hint: " + hint);
-    document.getElementById("hint").textContent = hint;
+    document.getElementById("hint").value = hint;
   });
+
+  document
+    .getElementById("puzzleNumber")
+    .addEventListener("change", function () {
+      let gameNumberSelected = document.getElementById("gameNumber").value;
+      let puzzleNumberSelected = document.getElementById("puzzleNumber").value;
+      let hintNumberSelect = document.getElementById("hintNumber");
+      //remove all options
+      hintNumberSelect.innerHTML = "";
+
+      let puzzlesArr =
+        gameDataParsed[gameNumberSelected - 1][puzzleNumberSelected - 1];
+      for (let i = 0; i < puzzlesArr.length; i++) {
+        let option = document.createElement("option");
+        option.text = i + 1;
+        option.value = i + 1;
+        hintNumberSelect.add(option);
+      }
+
+      let hint =
+        gameDataParsed[gameNumberSelected - 1][puzzleNumberSelected - 1][0];
+      document.getElementById("hint").textContent = hint;
+    });
+
+  document
+    .getElementById("puzzleNumber")
+    .addEventListener("change", function () {
+      let gameNumberSelected = document.getElementById("gameNumber").value;
+      let puzzleNumberSelected = document.getElementById("puzzleNumber").value;
+      let hintNumberSelected = document.getElementById("hintNumber").value;
+      let hint =
+        gameDataParsed[gameNumberSelected - 1][puzzleNumberSelected - 1][
+          hintNumberSelected - 1
+        ];
+      console.log("hint: " + hint);
+      document.getElementById("hint").value = hint;
+    });
 
   document.getElementById("hintNumber").addEventListener("change", function () {
     let gameNumberSelected = document.getElementById("gameNumber").value;
@@ -98,15 +135,7 @@ $(document).ready(function () {
       gameDataParsed[gameNumberSelected - 1][puzzleNumberSelected - 1][
         hintNumberSelected - 1
       ];
-    console.log("hint: " + hint);
     document.getElementById("hint").value = hint;
-  });
-
-  document.getElementById("addGame").addEventListener("click", function () {
-    console.log("addGame");
-    // let gameDataParsed = JSON.parse(gameData);
-    gameDataParsed.push([]);
-    resetGameHintData(gameDataParsed);
   });
 
   document.getElementById("removeGame").addEventListener("click", function () {
