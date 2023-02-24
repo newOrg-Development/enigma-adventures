@@ -53,9 +53,21 @@ $(document).ready(function () {
   }
 
   function onScanSuccess(decodedText, decodedResult) {
-    document.getElementById("qrCodeData").value = decodedText;
-
-    updateHints();
+    // document.getElementById("qrCodeData").value = decodedText;
+    // document.getElementById("magicUrl").innerText = document.getElementById(
+    //   "scanner__dashboard_section_csr"
+    // ).innerHTML;
+    //try to select the option with the value of decodedText
+    let select = document.getElementById("qrCodeData");
+    for (let i = 0; i < select.options.length; i++) {
+      if (select.options[i].text == decodedText) {
+        select.selectedIndex = i;
+        // click the button html5-qrcode-button-camera-stop
+        document.getElementById("html5-qrcode-button-camera-stop").click();
+        break;
+      }
+    }
+    //updateHints();
   }
 
   function onScanFailure(error) {
