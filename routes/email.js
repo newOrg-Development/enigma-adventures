@@ -16,12 +16,8 @@ async function main(userInputs) {
   let emailText =
     "Your team name is " +
     userInputs.teamName +
-    " and your team email is " +
-    userInputs.teamEmail +
-    " and your team password is " +
-    userInputs.teamPassword +
-    " and the scanner data  is " +
-    userInputs.qrCodeData;
+    " and your magicLink is " +
+    userInputs.magicLink;
   // Generate test SMTP service account from ethereal.email
   // Only needed if you don't have a real mail account for testing
   // let testAccount = await nodemailer.createTestAccount();

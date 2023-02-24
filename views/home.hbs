@@ -2,7 +2,7 @@
   <div class="mt-5">
 
   </div>
-  <div id="signUpHidder" style="display:none">
+  <div id="signUpHidder">
     <div class="mb-3">
       <label for="teamName" class="form-label">Team Name</label>
       <input type="text" class="form-control" id="teamName" />
@@ -17,12 +17,20 @@
       />
 
     </div>
+    <div class="form-check mb-4 mt-4" id="sendEmailDiv">
+      <input class="form-check-input" type="checkbox" value="" id="sendEmail" />
+      <label class="form-check-label" for="sendEmail">
+        Send Email
+      </label>
+    </div>
+    <hr />
   </div>
 
   {{! <div class="mb-3">
     <label for="teamPassword" class="form-label">Password</label>
     <input type="password" class="form-control" id="teamPassword" />
   </div> }}
+
   <div class="mb-3">
     <label for="qrCodeData" class="form-label">Scanner Data</label>
     {{! <input type="text" class="form-control" id="qrCodeData" value="hint" /> }}

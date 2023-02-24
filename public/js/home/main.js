@@ -149,6 +149,8 @@ $(document).ready(function () {
     if (qrCodeData == "signUp") {
       let teamName = document.getElementById("teamName").value;
       let teamEmail = document.getElementById("teamEmail").value;
+      let sendEmail = document.getElementById("sendEmail").checked;
+      console.log("sendEmail: " + sendEmail);
       // let teamPassword = document.getElementById("teamPassword").value;
       // let qrCodeData = document.getElementById("qrCodeData").value;
       // get selected value from qrCodeData select
@@ -184,9 +186,11 @@ $(document).ready(function () {
               document.getElementById("magicUrl").innerText =
                 "https://enigma-adventures.herokuapp.com/magicLink?uuid=" +
                 msg.uuid;
+              sendEmail();
             } else {
               let url = "https://localhost:3000/magicLink?uuid=" + msg.uuid;
               document.getElementById("magicUrl").innerText = url;
+              sendEmail();
             }
             // $("#success-saved").removeAttr("hidden");
             // $("#success-saved").show("fade");
@@ -196,6 +200,36 @@ $(document).ready(function () {
             //       .getElementById("success-saved")
             //       .setAttribute("hidden", "true");
             //   };
+
+            function sendEmail() {
+              let teamName = document.getElementById("teamName").value;
+              let teamEmail = document.getElementById("teamEmail").value;
+              let magicLink = document.getElementById("magicUrl").innerText;
+
+              $.ajax({
+                type: "POST",
+                url: "/email",
+                data: {
+                  teamName: teamName,
+                  teamEmail: teamEmail,
+                  //teamPassword: teamPassword,
+                  magicLink: magicLink,
+                },
+                success: function (msg) {
+                  if (msg == "false") {
+                  } else {
+                    // $("#success-saved").removeAttr("hidden");
+                    // $("#success-saved").show("fade");
+                    // document.getElementById("alert-successsaveClose").onclick =
+                    //   function () {
+                    //     document
+                    //       .getElementById("success-saved")
+                    //       .setAttribute("hidden", "true");
+                    //   };
+                  }
+                },
+              });
+            }
           }
         },
       });
