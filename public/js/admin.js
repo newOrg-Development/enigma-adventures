@@ -1,4 +1,3 @@
-//run when ready
 $(document).ready(function () {
   let temp = [
     [

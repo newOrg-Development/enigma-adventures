@@ -53,7 +53,128 @@ async function docer(input) {
   const texttoWrite = await client.documents.batchUpdate(updateObject);
 }
 
-async function getGameStates(input) {
+async function getLeaderboard() {
+  //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
+  const auth = new docs.auth.GoogleAuth({
+    keyFilename: "credentials.json",
+    // Scopes can be specified either as an array or as a single, space-delimited string.
+    scopes: ["https://www.googleapis.com/auth/documents"],
+  });
+  const authClient = await auth.getClient();
+
+  const client = await docs.docs({
+    version: "v1",
+    auth: authClient,
+  });
+
+  const createResponse = await client.documents.get({
+    documentId: "1HNawNy2v4WrrOyVCSNH6MIjyzDBClPPaSgf-6mZZ-nw",
+  });
+
+  console.log("here here here ", createResponse.data.body.content[1]);
+  let fullText = "";
+  createResponse.data.body.content[1].paragraph.elements.forEach((element) => {
+    fullText += element.textRun.content;
+  });
+
+  return fullText;
+  //   return createResponse.data.body.content[1].paragraph.elements[0].textRun
+  //     .content;
+
+  // let upParsed = "&&" + input;
+
+  // let updateObject = {
+  //   documentId: "1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk",
+  //   resource: {
+  //     requests: [
+  //       {
+  //         insertText: {
+  //           text: upParsed,
+  //           location: {
+  //             index: 1, // Modified
+  //           },
+  //         },
+  //       },
+  //     ],
+  //   },
+  // };
+
+  // const texttoWrite = await client.documents.batchUpdate(updateObject);
+}
+
+async function updateLeaderboard(input) {
+  //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
+  const auth = new docs.auth.GoogleAuth({
+    keyFilename: "credentials.json",
+    // Scopes can be specified either as an array or as a single, space-delimited string.
+    scopes: ["https://www.googleapis.com/auth/documents"],
+  });
+  const authClient = await auth.getClient();
+
+  const client = await docs.docs({
+    version: "v1",
+    auth: authClient,
+  });
+
+  const createResponse = await client.documents.get({
+    documentId: "1HNawNy2v4WrrOyVCSNH6MIjyzDBClPPaSgf-6mZZ-nw",
+  });
+
+  // console.log("!!!!!!", createResponse.data.body.content);
+  let endIndex = createResponse.data.body.content[1].endIndex;
+  let startIndex = createResponse.data.body.content[1].paragraph.elements[0];
+
+  //  console.log("startIndex ", startIndex, "endIndex ", endIndex);
+  // const createResponse = await client.documents.get({
+  //   documentId: "1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk",
+  // });
+  //make input array into string
+  let textInput = "";
+  for (let i = 0; i < input.length; i++) {
+    if (i != input.length - 1 && input[i] != "") {
+      textInput += input[i] + "&&";
+    } else {
+      textInput += input[i];
+    }
+  }
+
+  console.log("tester", textInput);
+  const updateResponse = await client.documents.batchUpdate({
+    documentId: "1HNawNy2v4WrrOyVCSNH6MIjyzDBClPPaSgf-6mZZ-nw",
+    requestBody: {
+      requests: [
+        {
+          deleteContentRange: {
+            range: {
+              segmentId: "",
+              startIndex: 1,
+              endIndex: endIndex,
+            },
+          },
+        },
+        {
+          insertText: {
+            text: textInput,
+
+            // The first text inserted into the document must create a paragraph,
+            // which can't be done with the `location` property.  Use the
+            // `endOfSegmentLocation` instead, which assumes the Body if
+            // unspecified.
+            endOfSegmentLocation: {},
+          },
+        },
+      ],
+    },
+  });
+
+  // console
+  //   .log
+  //   (createResponse.data.body.content[1].paragraph.elements[0].textRun.content)
+
+  return;
+}
+
+async function getGameStates() {
   //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
   const auth = new docs.auth.GoogleAuth({
     keyFilename: "credentials.json",
@@ -71,12 +192,15 @@ async function getGameStates(input) {
     documentId: "1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk",
   });
 
-  // console
-  //   .log
-  //   (createResponse.data.body.content[1].paragraph.elements[0].textRun.content)
+  console.log("here here here ", createResponse.data.body.content[1]);
+  let fullText = "";
+  createResponse.data.body.content[1].paragraph.elements.forEach((element) => {
+    fullText += element.textRun.content;
+  });
 
-  return createResponse.data.body.content[1].paragraph.elements[0].textRun
-    .content;
+  return fullText;
+  //   return createResponse.data.body.content[1].paragraph.elements[0].textRun
+  //     .content;
 
   // let upParsed = "&&" + input;
 
@@ -117,19 +241,18 @@ async function updateGameStates(input) {
     documentId: "1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk",
   });
 
-  console.log(
-    "!!!!!!",
-    createResponse.data.body.content[1].paragraph.elements[0].startIndex
-  );
-  let endIndex =
-    createResponse.data.body.content[1].paragraph.elements[0].endIndex;
+  // console.log("!!!!!!", createResponse.data.body.content);
+  let endIndex = createResponse.data.body.content[1].endIndex;
+  let startIndex = createResponse.data.body.content[1].paragraph.elements[0];
+
+  //  console.log("startIndex ", startIndex, "endIndex ", endIndex);
   // const createResponse = await client.documents.get({
   //   documentId: "1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk",
   // });
   //make input array into string
   let textInput = "";
   for (let i = 0; i < input.length; i++) {
-    if (i != input.length - 1) {
+    if (i != input.length - 1 && input[i] != "") {
       textInput += input[i] + "&&";
     } else {
       textInput += input[i];
@@ -143,7 +266,11 @@ async function updateGameStates(input) {
       requests: [
         {
           deleteContentRange: {
-            range: { segmentId: "", startIndex: 1, endIndex: endIndex },
+            range: {
+              segmentId: "",
+              startIndex: 1,
+              endIndex: endIndex,
+            },
           },
         },
         {
@@ -240,6 +367,7 @@ app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 
 const mainHead = module.require("./views/custom/mainHead.hbs");
 const adminHead = module.require("./views/custom/adminHead.hbs");
+const leaderboard = module.require("./views/custom/leaderboard.hbs");
 
 const emailRouter = require("./routes/email");
 const adminRouter = require("./routes/admin");
@@ -263,6 +391,17 @@ app.get("/", (req, res) => {
   }
 });
 
+app.get("/leaderboard", (req, res) => {
+  getLeaderboard().then((data) => {
+    console.log("data: " + data);
+
+    res.render("leaderboard", {
+      customHead: leaderboard,
+      leaderboardData: data,
+    });
+  });
+});
+
 // teamName: teamName,
 // teamEmail: teamEmail,
 // teamPassword: teamPassword,
@@ -280,11 +419,13 @@ app.get("/magicLink", (req, res) => {
         console.log("got it");
         session = req.session;
         //session.userid = req.body.username;
-
+        session.uuid = gameStateParams[0];
         session.teamName = gameStateParams[1];
         session.teamEmail = gameStateParams[2];
+        session.cluesUsed = gameStateParams[3];
+        session.timestamp = gameStateParams[4];
         //  let uuid = uuidv4();
-        session.uuid = gameStateParams[0];
+
         // session.env = process.env.NODE_ENV;
 
         res.render("home", {
@@ -298,7 +439,7 @@ app.get("/magicLink", (req, res) => {
 });
 
 app.post("/updateHint", (req, res) => {
-  console.log("uiid" + req.body.uuid);
+  //console.log("uiid" + req.body.uuid);
   let uuid = req.body.uuid;
   getGameStates().then((data) => {
     //console.log("data: " + data);
@@ -306,7 +447,7 @@ app.post("/updateHint", (req, res) => {
     let newGameStates = [];
 
     newGameStates = data.split("&&");
-
+    //  console.log("newGameStates tt" + newGameStates);
     //newGameStates.forEach((gameState) => {
 
     data.split("&&").forEach((gameState, index) => {
@@ -319,13 +460,18 @@ app.post("/updateHint", (req, res) => {
 
         gameStateParams.forEach((param, index2) => {
           if (index2 != 3) {
-            newGameStateParams += param + ";";
+            if (gameStateParams.length - 1 == index2) {
+              newGameStateParams += param;
+            } else {
+              newGameStateParams += param + ";";
+            }
+
             newGameStates[index] = newGameStateParams;
           } else {
-            console.log("param " + param);
-            newGameStateParams += parseInt(param) + 1;
+            //console.log("param " + param);
+            newGameStateParams += parseInt(param) + 1 + ";" + param;
             newGameStates[index] = newGameStateParams;
-            console.log("newGameStates " + newGameStates);
+            //  console.log("newGameStates " + newGameStates);
             updateGameStates(newGameStates);
           }
         });
@@ -358,6 +504,80 @@ app.post("/updateHint", (req, res) => {
   });
 });
 
+app.post("/gameEnd", (req, res) => {
+  console.log("uiid" + req.body.uuid);
+  let uuid = req.body.uuid;
+  let timestamp = req.body.timestamp;
+  let teamName = req.body.teamName;
+  let cluesUsed = req.body.cluesUsed;
+  getGameStates().then((data) => {
+    console.log("data: " + data);
+    let newHintsNumber = 0;
+    let newGameStates = [];
+    let gameStart = timestamp;
+    let gameEnd = Date.now();
+    let gameDuration = gameEnd - gameStart;
+    console.log(
+      "gameStart: " +
+        gameStart +
+        " gameEnd: " +
+        gameEnd +
+        " gameDuration: " +
+        gameDuration
+    );
+    //formate time
+    //  let hours = Math.floor(gameDuration / 3600000); // 1 Hour = 36000 Milliseconds
+    //let minutes = Math.floor((gameDuration % 3600000) / 60000); // 1 Minutes = 60000 Milliseconds
+    let seconds = Math.floor(((gameDuration % 360000) % 60000) / 1000); // 1 Second = 1000 Milliseconds
+    console.log("gameDuration: " + seconds);
+    newGameStates = data.split("&&");
+
+    let newLeaderboardEntry = teamName + ";" + cluesUsed + ";" + seconds;
+    getLeaderboard().then((leaderboardData) => {
+      console.log("data: " + leaderboardData);
+      leaderboardData = leaderboardData.split("&&");
+      let tempLeaderChange = "";
+      let breaker = false;
+      leaderboardData.forEach((leaderboardEntry, index) => {
+        let leaderboardEntryParams = leaderboardEntry.split(";");
+        console.log(seconds, "secs ", leaderboardEntryParams[2]);
+        if (seconds < parseInt(leaderboardEntryParams[2]) && breaker == false) {
+          tempLeaderChange = index;
+          breaker = true;
+          //delete
+
+          console.log("leaderboardData: " + leaderboardData);
+        }
+        console.log("tempLeaderChange ", tempLeaderChange);
+        console.log("leaderboardData ", leaderboardData[tempLeaderChange]);
+      });
+      //delete leaderboardData[tempLeaderChange];
+      leaderboardData.splice(tempLeaderChange, 1);
+      // leaderboardData.splice(tempLeaderChange, 0);
+      leaderboardData.splice(tempLeaderChange, 0, newLeaderboardEntry);
+      console.log("$$$$leaderboardData: " + leaderboardData);
+
+      updateLeaderboard(leaderboardData);
+    });
+
+    // console.log(
+    //   "data",
+    //   data,
+    //   "*3************newGameStates " + newGameStates.length
+    // );
+    //newGameStates.forEach((gameState) => {
+    data.split("&&").forEach((gameState, index) => {
+      //console.log("checking", uuid);
+      if (gameState.includes(uuid)) {
+        //   console.log("found it");
+        // console.log("**************newGameStates " + newGameStates);
+        newGameStates[index] = "";
+        updateGameStates(newGameStates);
+      }
+    });
+  });
+});
+
 app.post("/signUp", (req, res) => {
   if (
     req.body.username == myusername &&
@@ -369,10 +589,22 @@ app.post("/signUp", (req, res) => {
     //session.userid = req.body.username;
     session.teamName = req.body.teamName;
     session.teamEmail = req.body.teamEmail;
+    session.timestamp = req.body.timestamp;
+    session.cluesUsed = 0;
     let uuid = uuidv4();
     session.uuid = uuid;
     session.env = process.env.NODE_ENV;
-    docer(uuid + ";" + req.body.teamName + ";" + req.body.teamEmail + ";" + 0);
+    docer(
+      uuid +
+        ";" +
+        req.body.teamName +
+        ";" +
+        req.body.teamEmail +
+        ";" +
+        session.cluesUsed +
+        ";" +
+        req.body.timestamp
+    );
     console.log(req.session);
     res.send(req.session);
   } else {

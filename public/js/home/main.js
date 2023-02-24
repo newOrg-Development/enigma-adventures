@@ -1,14 +1,5 @@
 //import { hinter } from "./getHint.js";
 $(document).ready(function () {
-  // let sessionData = document.getElementById("sessionData").innerText;
-  // sessionData = sessionData.split("&&");
-  // console.log("sessionData: " + sessionData.length);
-  // sessionData.forEach(gameState => {
-  //   let gameStateElements = gameState.split(';');
-
-  // });
-  // //get data betweeen uuid and TeamName
-  // let uuid = sessionData[0].split("uuid")[1];
   if (document.getElementById("sessionData").innerText != "") {
     document.getElementById("logoutDiv").style.display = "block";
   }
@@ -69,12 +60,16 @@ $(document).ready(function () {
     // let teamPassword = document.getElementById("teamPassword").value;
     let qrCodeData = document.getElementById("qrCodeData").value;
 
+    //get timestamp
+    let timestamp = new Date().getTime();
+    console.log("timestamp: " + timestamp);
     $.ajax({
       type: "POST",
       url: "/signUp",
       data: {
         teamName: teamName,
         teamEmail: teamEmail,
+        timestamp: timestamp,
         //teamPassword: teamPassword,
         qrCodeData: qrCodeData,
         username: "user1",
@@ -119,6 +114,9 @@ $(document).ready(function () {
     let session = document.getElementById("sessionData").innerText;
     session = JSON.parse(session);
     let uuid = session.uuid;
+    let timestamp = session.timestamp;
+    let teamName = session.teamName;
+    let cluesUsed = session.cluesUsed;
     if (uuid == undefined) {
       uuid = "";
     }
@@ -145,7 +143,7 @@ $(document).ready(function () {
           }
         },
       });
-    } else if (qrCodeData == "new") {
+    } else if (qrCodeData == "email") {
       $.ajax({
         type: "POST",
         url: "/email",
@@ -154,6 +152,32 @@ $(document).ready(function () {
           teamEmail: teamEmail,
           //teamPassword: teamPassword,
           qrCodeData: qrCodeData,
+        },
+        success: function (msg) {
+          if (msg == "false") {
+          } else {
+            // $("#success-saved").removeAttr("hidden");
+            // $("#success-saved").show("fade");
+            // document.getElementById("alert-successsaveClose").onclick =
+            //   function () {
+            //     document
+            //       .getElementById("success-saved")
+            //       .setAttribute("hidden", "true");
+            //   };
+          }
+        },
+      });
+    } else if (qrCodeData == "hint" && uuid == "") {
+      alert("You must be logged in to get a hint");
+    } else if (qrCodeData == "gameEnd") {
+      $.ajax({
+        type: "POST",
+        url: "/gameEnd",
+        data: {
+          uuid,
+          timestamp,
+          teamName,
+          cluesUsed,
         },
         success: function (msg) {
           if (msg == "false") {
