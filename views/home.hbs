@@ -19,15 +19,24 @@
   </div> }}
   <div class="mb-3">
     <label for="qrCodeData" class="form-label">Scanner Data</label>
-    <input type="text" class="form-control" id="qrCodeData" value="hint" />
+    {{! <input type="text" class="form-control" id="qrCodeData" value="hint" /> }}
+    <select
+      class="form-select"
+      aria-label="Default select example"
+      id="qrCodeData"
+    >
+      <option value="1">hint</option>
+      <option value="2">signUp</option>
+      <option value="3">gameEnd</option>
+    </select>
   </div>
 </form>
 
-<div class="d-grid gap-2 mt-5">
+{{! <div class="d-grid gap-2 mt-5">
   <button class="btn btn-primary" type="button" id="signUp">Sign Up</button>
-</div>
+</div> }}
 
-<div class="d-grid gap-2 mt-3">
+<div class="d-grid gap-2 mt-2">
   <button class="btn btn-primary" type="button" id="showScanner">Show/Hide
     Scanner</button>
 </div>

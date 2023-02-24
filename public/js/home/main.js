@@ -54,108 +54,113 @@ $(document).ready(function () {
   );
   html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 
-  document.getElementById("signUp").addEventListener("click", function () {
-    let teamName = document.getElementById("teamName").value;
-    let teamEmail = document.getElementById("teamEmail").value;
-    // let teamPassword = document.getElementById("teamPassword").value;
-    let qrCodeData = document.getElementById("qrCodeData").value;
+  // document.getElementById("signUp").addEventListener("click", function () {
+  //   let teamName = document.getElementById("teamName").value;
+  //   let teamEmail = document.getElementById("teamEmail").value;
+  //   // let teamPassword = document.getElementById("teamPassword").value;
+  //   // let qrCodeData = document.getElementById("qrCodeData").value;
+  //   // get selected value from qrCodeData select
+  //   //     let qrCodeData = document.getElementById("qrCodeData").value;
+  //   // console.log("qrCodeData: " + qrCodeData);
 
-    //get timestamp
-    let timestamp = new Date().getTime();
-    console.log("timestamp: " + timestamp);
-    $.ajax({
-      type: "POST",
-      url: "/signUp",
-      data: {
-        teamName: teamName,
-        teamEmail: teamEmail,
-        timestamp: timestamp,
-        //teamPassword: teamPassword,
-        qrCodeData: qrCodeData,
-        username: "user1",
-        password: "mypassword",
-      },
-      success: function (msg) {
-        if (msg == "false") {
-        } else {
-          console.log("msg: " + JSON.stringify(msg));
-          document.getElementById("logoutDiv").style.display = "block";
-          document.getElementById("sessionData").innerText =
-            JSON.stringify(msg);
+  //   //get timestamp
+  //   let timestamp = new Date().getTime();
+  //   console.log("timestamp: " + timestamp);
+  //   $.ajax({
+  //     type: "POST",
+  //     url: "/signUp",
+  //     data: {
+  //       teamName: teamName,
+  //       teamEmail: teamEmail,
+  //       timestamp: timestamp,
+  //       //teamPassword: teamPassword,
+  //       qrCodeData: qrCodeData,
+  //       username: "user1",
+  //       password: "mypassword",
+  //     },
+  //     success: function (msg) {
+  //       if (msg == "false") {
+  //       } else {
+  //         console.log("msg: " + JSON.stringify(msg));
+  //         document.getElementById("logoutDiv").style.display = "block";
+  //         document.getElementById("sessionData").innerText =
+  //           JSON.stringify(msg);
 
-          //make a url out of the msg
+  //         //make a url out of the msg
 
-          if (msg.env == "production") {
-            document.getElementById("magicUrl").innerText =
-              "https://enigma-adventures.herokuapp.com/magicLink?uuid=" +
-              msg.uuid;
-          } else {
-            let url = "https://localhost:3000/magicLink?uuid=" + msg.uuid;
-            document.getElementById("magicUrl").innerText = url;
-          }
-          // $("#success-saved").removeAttr("hidden");
-          // $("#success-saved").show("fade");
-          // document.getElementById("alert-successsaveClose").onclick =
-          //   function () {
-          //     document
-          //       .getElementById("success-saved")
-          //       .setAttribute("hidden", "true");
-          //   };
-        }
-      },
-    });
-  });
+  //         if (msg.env == "production") {
+  //           document.getElementById("magicUrl").innerText =
+  //             "https://enigma-adventures.herokuapp.com/magicLink?uuid=" +
+  //             msg.uuid;
+  //         } else {
+  //           let url = "https://localhost:3000/magicLink?uuid=" + msg.uuid;
+  //           document.getElementById("magicUrl").innerText = url;
+  //         }
+  //         // $("#success-saved").removeAttr("hidden");
+  //         // $("#success-saved").show("fade");
+  //         // document.getElementById("alert-successsaveClose").onclick =
+  //         //   function () {
+  //         //     document
+  //         //       .getElementById("success-saved")
+  //         //       .setAttribute("hidden", "true");
+  //         //   };
+  //       }
+  //     },
+  //   });
+  // });
 
   document.getElementById("submitData").addEventListener("click", function () {
     // let teamName = document.getElementById("teamName").value;
     // let teamEmail = document.getElementById("teamEmail").value;
     //let teamPassword = document.getElementById("teamPassword").value || "";
-    let qrCodeData = document.getElementById("qrCodeData").value;
-    let session = document.getElementById("sessionData").innerText;
-    session = JSON.parse(session);
-    let uuid = session.uuid;
-    let timestamp = session.timestamp;
-    let teamName = session.teamName;
-    let cluesUsed = session.cluesUsed;
-    if (uuid == undefined) {
-      uuid = "";
-    }
 
-    if (qrCodeData == "hint" && uuid != "") {
-      //hinter();
+    let qrCodeData =
+      document.getElementById("qrCodeData").options[
+        document.getElementById("qrCodeData").selectedIndex
+      ].text;
+
+    if (qrCodeData == "signUp") {
+      let teamName = document.getElementById("teamName").value;
+      let teamEmail = document.getElementById("teamEmail").value;
+      // let teamPassword = document.getElementById("teamPassword").value;
+      // let qrCodeData = document.getElementById("qrCodeData").value;
+      // get selected value from qrCodeData select
+      //     let qrCodeData = document.getElementById("qrCodeData").value;
+      // console.log("qrCodeData: " + qrCodeData);
+
+      //get timestamp
+      let timestamp = new Date().getTime();
+      console.log("timestamp: " + timestamp);
       $.ajax({
         type: "POST",
-        url: "/updateHint",
-        data: {
-          uuid,
-        },
-        success: function (msg) {
-          if (msg == "false") {
-          } else {
-            // $("#success-saved").removeAttr("hidden");
-            // $("#success-saved").show("fade");
-            // document.getElementById("alert-successsaveClose").onclick =
-            //   function () {
-            //     document
-            //       .getElementById("success-saved")
-            //       .setAttribute("hidden", "true");
-            //   };
-          }
-        },
-      });
-    } else if (qrCodeData == "email") {
-      $.ajax({
-        type: "POST",
-        url: "/email",
+        url: "/signUp",
         data: {
           teamName: teamName,
           teamEmail: teamEmail,
+          timestamp: timestamp,
           //teamPassword: teamPassword,
-          qrCodeData: qrCodeData,
+          qrCodeData: "signUp",
+          username: "user1",
+          password: "mypassword",
         },
         success: function (msg) {
           if (msg == "false") {
           } else {
+            console.log("msg: " + JSON.stringify(msg));
+            document.getElementById("logoutDiv").style.display = "block";
+            document.getElementById("sessionData").innerText =
+              JSON.stringify(msg);
+
+            //make a url out of the msg
+
+            if (msg.env == "production") {
+              document.getElementById("magicUrl").innerText =
+                "https://enigma-adventures.herokuapp.com/magicLink?uuid=" +
+                msg.uuid;
+            } else {
+              let url = "https://localhost:3000/magicLink?uuid=" + msg.uuid;
+              document.getElementById("magicUrl").innerText = url;
+            }
             // $("#success-saved").removeAttr("hidden");
             // $("#success-saved").show("fade");
             // document.getElementById("alert-successsaveClose").onclick =
@@ -167,32 +172,90 @@ $(document).ready(function () {
           }
         },
       });
-    } else if (qrCodeData == "hint" && uuid == "") {
-      alert("You must be logged in to get a hint");
-    } else if (qrCodeData == "gameEnd") {
-      $.ajax({
-        type: "POST",
-        url: "/gameEnd",
-        data: {
-          uuid,
-          timestamp,
-          teamName,
-          cluesUsed,
-        },
-        success: function (msg) {
-          if (msg == "false") {
-          } else {
-            // $("#success-saved").removeAttr("hidden");
-            // $("#success-saved").show("fade");
-            // document.getElementById("alert-successsaveClose").onclick =
-            //   function () {
-            //     document
-            //       .getElementById("success-saved")
-            //       .setAttribute("hidden", "true");
-            //   };
-          }
-        },
-      });
+    } else {
+      // console.log("qrCodeData: " + qrCodeData);
+      let session = document.getElementById("sessionData").innerText;
+      session = JSON.parse(session);
+      let uuid = session.uuid;
+      let timestamp = session.timestamp;
+      let teamName = session.teamName;
+      let cluesUsed = session.cluesUsed;
+      if (uuid == undefined) {
+        uuid = "";
+      }
+      if (qrCodeData == "hint" && uuid != "") {
+        //hinter();
+        $.ajax({
+          type: "POST",
+          url: "/updateHint",
+          data: {
+            uuid,
+          },
+          success: function (msg) {
+            if (msg == "false") {
+            } else {
+              // $("#success-saved").removeAttr("hidden");
+              // $("#success-saved").show("fade");
+              // document.getElementById("alert-successsaveClose").onclick =
+              //   function () {
+              //     document
+              //       .getElementById("success-saved")
+              //       .setAttribute("hidden", "true");
+              //   };
+            }
+          },
+        });
+      } else if (qrCodeData == "email") {
+        $.ajax({
+          type: "POST",
+          url: "/email",
+          data: {
+            teamName: teamName,
+            teamEmail: teamEmail,
+            //teamPassword: teamPassword,
+            qrCodeData: qrCodeData,
+          },
+          success: function (msg) {
+            if (msg == "false") {
+            } else {
+              // $("#success-saved").removeAttr("hidden");
+              // $("#success-saved").show("fade");
+              // document.getElementById("alert-successsaveClose").onclick =
+              //   function () {
+              //     document
+              //       .getElementById("success-saved")
+              //       .setAttribute("hidden", "true");
+              //   };
+            }
+          },
+        });
+      } else if (qrCodeData == "hint" && uuid == "") {
+        alert("You must be logged in to get a hint");
+      } else if (qrCodeData == "gameEnd") {
+        $.ajax({
+          type: "POST",
+          url: "/gameEnd",
+          data: {
+            uuid,
+            timestamp,
+            teamName,
+            cluesUsed,
+          },
+          success: function (msg) {
+            if (msg == "false") {
+            } else {
+              // $("#success-saved").removeAttr("hidden");
+              // $("#success-saved").show("fade");
+              // document.getElementById("alert-successsaveClose").onclick =
+              //   function () {
+              //     document
+              //       .getElementById("success-saved")
+              //       .setAttribute("hidden", "true");
+              //   };
+            }
+          },
+        });
+      }
     }
   });
 });
