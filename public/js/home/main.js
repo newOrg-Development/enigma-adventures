@@ -149,8 +149,8 @@ $(document).ready(function () {
     if (qrCodeData == "signUp") {
       let teamName = document.getElementById("teamName").value;
       let teamEmail = document.getElementById("teamEmail").value;
-      let sendEmail = document.getElementById("sendEmail").checked;
-      console.log("sendEmail: " + sendEmail);
+      // sendEmail = document.getElementById("sendEmail").checked;
+      // console.log("sendEmail: " + sendEmail);
       // let teamPassword = document.getElementById("teamPassword").value;
       // let qrCodeData = document.getElementById("qrCodeData").value;
       // get selected value from qrCodeData select
@@ -181,16 +181,21 @@ $(document).ready(function () {
               JSON.stringify(msg);
 
             //make a url out of the msg
+            let sendEmailBool = document.getElementById("sendEmail").checked;
 
             if (msg.env == "production") {
               document.getElementById("magicUrl").innerText =
                 "https://enigma-adventures.herokuapp.com/magicLink?uuid=" +
                 msg.uuid;
-              sendEmail();
+              if (sendEmailBool) {
+                sendEmail();
+              }
             } else {
               let url = "https://localhost:3000/magicLink?uuid=" + msg.uuid;
               document.getElementById("magicUrl").innerText = url;
-              sendEmail();
+              if (sendEmailBool) {
+                sendEmail();
+              }
             }
             // $("#success-saved").removeAttr("hidden");
             // $("#success-saved").show("fade");
