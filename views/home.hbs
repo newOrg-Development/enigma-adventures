@@ -1,18 +1,24 @@
 <form>
-  <div class="mb-3 mt-5">
-    <label for="teamName" class="form-label">Team Name</label>
-    <input type="text" class="form-control" id="teamName" />
-  </div>
-  <div class="mb-3">
-    <label for="teamEmail" class="form-label">Email Address</label>
-    <input
-      type="email"
-      class="form-control"
-      id="teamEmail"
-      aria-describedby="emailHelp"
-    />
+  <div class="mt-5">
 
   </div>
+  <div id="signUpHidder" style="display:none">
+    <div class="mb-3">
+      <label for="teamName" class="form-label">Team Name</label>
+      <input type="text" class="form-control" id="teamName" />
+    </div>
+    <div class="mb-3">
+      <label for="teamEmail" class="form-label">Email Address</label>
+      <input
+        type="email"
+        class="form-control"
+        id="teamEmail"
+        aria-describedby="emailHelp"
+      />
+
+    </div>
+  </div>
+
   {{! <div class="mb-3">
     <label for="teamPassword" class="form-label">Password</label>
     <input type="password" class="form-control" id="teamPassword" />
@@ -28,6 +34,7 @@
       <option value="1">hint</option>
       <option value="2">signUp</option>
       <option value="3">gameEnd</option>
+      <option value="4">clue</option>
     </select>
   </div>
 </form>

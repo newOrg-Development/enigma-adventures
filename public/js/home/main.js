@@ -1,5 +1,20 @@
 //import { hinter } from "./getHint.js";
 $(document).ready(function () {
+  //toggle display for signUphidder with qrCodeData is signUp
+
+  document.getElementById("qrCodeData").addEventListener("change", function () {
+    if (
+      document.getElementById("qrCodeData").options[
+        document.getElementById("qrCodeData").selectedIndex
+      ].text == "signUp"
+    ) {
+      //toggle signUpDiv display
+      document.getElementById("signUpHidder").style.display = "block";
+    } else {
+      document.getElementById("signUpHidder").style.display = "none";
+    }
+  });
+
   if (document.getElementById("sessionData").innerText != "") {
     document.getElementById("logoutDiv").style.display = "block";
   }
