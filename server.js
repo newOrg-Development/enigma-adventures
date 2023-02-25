@@ -11,8 +11,59 @@ const cookieParser = require("cookie-parser");
 const { v4: uuidv4 } = require("uuid");
 var env = process.env.NODE_ENV;
 console.log(`env is ${env}`);
-
 const docs = require("@googleapis/docs");
+const { google } = require("googleapis");
+const { Blob } = require("node:buffer");
+//clues link
+//https://drive.google.com/drive/folders/1Pc5zamgYqkDYvIRL1jQGmHDp57bxg_tC?usp=share_link
+async function driver() {
+  //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
+  const auth = new google.auth.GoogleAuth({
+    keyFilename: "driveCreds.json",
+    // Scopes can be specified either as an array or as a single, space-delimited string.
+    scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+  });
+  const authClient = await auth.getClient();
+
+  // const client = await docs.docs({
+  //   version: "v3",
+  //   auth: authClient,
+  // });
+  const drive = google.drive({
+    version: "v2",
+    auth: authClient,
+  });
+
+  let res = await drive.files.get({
+    fileId: "17Ma6k5lJ7bJ8FrVM-AMNqXhGs49Bwl4T",
+    alt: "media",
+  });
+
+  //var imageBuffer = res.buffer;
+  var imageName = "ticker.jpg";
+  let blob = res.data;
+  //const arrayBuffer = await blob.arrayBuffer();
+  // const buffer = Buffer.from(arrayBuffer);
+
+  fs.createWriteStream(imageName).write(res.data);
+
+  //   1zfzYmgZEUf__eSawVwsJHQlQ0ZpfOwWt
+  // 17Ma6k5lJ7bJ8FrVM-AMNqXhGs49Bwl4T
+  //   console.log(res);
+  //   let newData = res.data;
+  //   let blob = new Blob([res.data]);
+  //   const arrayBuffer = await blob.arrayBuffer();
+  //   const buffer = Buffer.from(arrayBuffer);
+
+  // let buffer = Buffer.from(res.data, "blob");
+  // console.log("buffer", buffer);
+  //write buffer to file
+  fs.writeFile("test.jpg", res.data, function (err) {
+    if (err) throw err;
+    console.log("Saved!");
+  });
+}
+//driver();
 
 async function docer(input) {
   //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
@@ -361,19 +412,22 @@ app.set("view engine", ".hbs");
 //app.set("views", path.resolve(__dirname, "./views"));
 //app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static("public"));
+app.use("/images", express.static("images"));
 app.use(bodyParser.json({ limit: "10mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 //app.use(cookieParser());
 
 const mainHead = module.require("./views/custom/mainHead.hbs");
 const adminHead = module.require("./views/custom/adminHead.hbs");
-const leaderboard = module.require("./views/custom/leaderboard.hbs");
+const leaderboardHead = module.require("./views/custom/leaderboardHead.hbs");
+const resetHead = module.require("./views/custom/resetHead.hbs");
 
 const emailRouter = require("./routes/email");
 const adminRouter = require("./routes/admin");
 //const magicLinkRouter = require("./routes/magicLink");
 
 const { Session } = require("inspector");
+const { file } = require("googleapis/build/src/apis/file");
 
 app.use("/email", emailRouter);
 
@@ -396,7 +450,7 @@ app.get("/leaderboard", (req, res) => {
     console.log("data: " + data);
 
     res.render("leaderboard", {
-      customHead: leaderboard,
+      customHead: leaderboardHead,
       leaderboardData: data,
     });
   });
@@ -615,6 +669,14 @@ app.post("/signUp", (req, res) => {
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.redirect("/");
+});
+
+app.get("/reset", (req, res) => {
+  //get all of the names of the images in the folder resetImgs
+  let resetImgs = fs.readdirSync("./public/images/resetImgs");
+  console.log(resetImgs[0]);
+
+  res.render("reset", { customHead: resetHead, resetImgs: resetImgs });
 });
 
 app.get("/admin", (req, res) => {
