@@ -5,10 +5,17 @@ $(document).ready(function () {
 
   //   let carouselTemplate = document.getElementById(
   //     "carouselItemTemplate"
-  // ).innerHTML;
-  // let  = document.getElementById("carouselInner");
+  //   ).innerHTML;
+  //   let dlUrl = document.getElementById("dlUrl").innerText;
+  //   console.log(dlUrl);
+  //   dlUrl = dlUrl.split(",");
 
-  //carousel change event
+  //   //carousel change event
+
+  //   //download img from dlUrl
+
+  //   //display dlurl as img
+  //   document.getElementById("dlImg").src = dlUrl[0].trim();
 
   $("#carouselMain").on("slid.bs.carousel", function (e) {
     let innerCarouselChildren =
@@ -55,10 +62,13 @@ $(document).ready(function () {
       }
     }
   });
-
-  let resetImgs = document.getElementById("resetImgs").innerText;
-  console.log(resetImgs);
+  let resetImgs = document.getElementById("dlUrl").innerText;
+  resetImgs = resetImgs.trim();
   resetImgs = resetImgs.split(",");
+  console.log(resetImgs);
+  // let resetImgs = document.getElementById("resetImgs").innerText;
+  console.log(resetImgs);
+  //resetImgs = resetImgs.split(",");
 
   resetImgs.forEach((img, index) => {
     let carouselItemTemplate = document.getElementById("carouselItemTemplate")
@@ -66,10 +76,25 @@ $(document).ready(function () {
     let newCarouselItem = carouselItemTemplate.cloneNode(true);
     let newClientCarouselItem = carouselItemTemplate.cloneNode(true);
 
-    console.log(newCarouselItem);
+    // let serverImg =   "/images/resetImgs/" + img.trim();
+    let googleDriveImg = img;
+    console.log(googleDriveImg);
     console.log("img ", img, " times ", index);
-    newCarouselItem.getElementsByTagName("img")[0].src =
-      "/images/resetImgs/" + img.trim();
+    newCarouselItem.getElementsByTagName("img")[0].src = img;
+
+    //get /proxy
+    // $.ajax({
+    //   url: "/proxy",
+    //   type: "GET",
+    //   data: { url: googleDriveImg },
+    //   success: function (data) {
+    //     console.log("data");
+    //     // newCarouselItem.getElementsByTagName("img")[0].src = data;
+    //   },
+    //   error: function (err) {
+    //     console.log("err", err);
+    //   },
+    // });
 
     newClientCarouselItem.getElementsByTagName("img")[0].src =
       "./images/placeholder-400X200.png";

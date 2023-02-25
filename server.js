@@ -14,8 +14,11 @@ console.log(`env is ${env}`);
 const docs = require("@googleapis/docs");
 const { google } = require("googleapis");
 const { Blob } = require("node:buffer");
+const fetch = require("node-fetch"); // To pipe received image back to caller
+const cors = require("cors");
 //clues link
 //https://drive.google.com/drive/folders/1Pc5zamgYqkDYvIRL1jQGmHDp57bxg_tC?usp=share_link
+
 async function driver() {
   //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
   const auth = new google.auth.GoogleAuth({
@@ -34,34 +37,18 @@ async function driver() {
     auth: authClient,
   });
 
-  let res = await drive.files.get({
+  //https://drive.google.com/drive/folders/1Pc5zamgYqkDYvIRL1jQGmHDp57bxg_tC
+
+  let filesList = await drive.files.list({
     fileId: "17Ma6k5lJ7bJ8FrVM-AMNqXhGs49Bwl4T",
-    alt: "media",
+    // alt: "media",
+    //fields: "id,name",
   });
+  console.log(filesList.data.items[0].downloadUrl);
 
-  //var imageBuffer = res.buffer;
-  var imageName = "ticker.jpg";
-  let blob = res.data;
-  //const arrayBuffer = await blob.arrayBuffer();
-  // const buffer = Buffer.from(arrayBuffer);
-
-  fs.createWriteStream(imageName).write(res.data);
-
-  //   1zfzYmgZEUf__eSawVwsJHQlQ0ZpfOwWt
-  // 17Ma6k5lJ7bJ8FrVM-AMNqXhGs49Bwl4T
-  //   console.log(res);
-  //   let newData = res.data;
-  //   let blob = new Blob([res.data]);
-  //   const arrayBuffer = await blob.arrayBuffer();
-  //   const buffer = Buffer.from(arrayBuffer);
-
-  // let buffer = Buffer.from(res.data, "blob");
-  // console.log("buffer", buffer);
-  //write buffer to file
-  fs.writeFile("test.jpg", res.data, function (err) {
-    if (err) throw err;
-    console.log("Saved!");
-  });
+  dlUrl = filesList.data.items[0].downloadUrl;
+  //dowlnoad file from dlUrl link
+  return "test";
 }
 //driver();
 
@@ -384,6 +371,7 @@ app.use(express.urlencoded({ extended: true }));
 //serving public file
 app.use(express.static(__dirname));
 app.use(cookieParser());
+app.use(cors()); // Enable cross-origin resource sharing
 
 //username and password
 const myusername = "user1";
@@ -673,10 +661,74 @@ app.get("/logout", (req, res) => {
 
 app.get("/reset", (req, res) => {
   //get all of the names of the images in the folder resetImgs
-  let resetImgs = fs.readdirSync("./public/images/resetImgs");
-  console.log(resetImgs[0]);
+  async function driver() {
+    //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
+    const auth = new google.auth.GoogleAuth({
+      keyFilename: "driveCreds.json",
+      // Scopes can be specified either as an array or as a single, space-delimited string.
+      scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+    });
+    const authClient = await auth.getClient();
 
-  res.render("reset", { customHead: resetHead, resetImgs: resetImgs });
+    // const client = await docs.docs({
+    //   version: "v3",
+    //   auth: authClient,
+    // });
+    const drive = google.drive({
+      version: "v3",
+      auth: authClient,
+    });
+    //https://stackoverflow.com/questions/49099248/upload-image-to-heroku-with-node-and-get-its-url
+    //https://drive.google.com/drive/folders/1Pc5zamgYqkDYvIRL1jQGmHDp57bxg_tC
+
+    // https://gist.github.com/Musinux/9945da1a2afd284cef5ec0377f4b2460
+    let filesList = await drive.files.list({
+      //fileId: "1mOyL_hVrm5YQSQ3wP2iWXfbkZwnuO91s",
+      q: `'${"1mOyL_hVrm5YQSQ3wP2iWXfbkZwnuO91s"}' in parents`,
+      // alt: "media",
+      //fields: "id,name",
+    });
+    console.log(filesList);
+
+    let fileItems = filesList.data.files;
+    let picturesUrl = [];
+    fileItems.forEach((fileItem) => {
+      picturesUrl.push(
+        " https://docs.google.com/uc?id=" + fileItem.id + "&export=download"
+      );
+    });
+    //   console.log(fileItem.title);
+    //   console.log(fileItem.id);
+    // });
+    // dlUrl = filesList.data.items[0].downloadUrl;
+    //dowlnoad file from dlUrl link
+
+    let dlUrl = picturesUrl.toString();
+    let resetImgs = fs.readdirSync("./public/images/resetImgs");
+    console.log(resetImgs[0]);
+    console.log("dlurl", dlUrl);
+    res.render("reset", {
+      customHead: resetHead,
+      resetImgs: resetImgs,
+      dlUrl: dlUrl,
+    });
+    // return filesList.data.items[0].downloadUrl;
+  }
+  driver();
+});
+
+// GET request to serve as proxy for images
+app.get("/proxy", (req, res) => {
+  let tester =
+    "https://docs.google.com/uc?id=1zfzYmgZEUf__eSawVwsJHQlQ0ZpfOwWt&export=download";
+  // let trimmedUrl = req.query.url.replace(" ", "");
+  console.log("proxy", req.query.url);
+  const url = req.query.url;
+  if (url && url.length > 0) {
+    fetch(tester)
+      .then((res) => res.body.pipe(res))
+      .catch((err) => console.log(err));
+  }
 });
 
 app.get("/admin", (req, res) => {
