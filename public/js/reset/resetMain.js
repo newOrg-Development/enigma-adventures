@@ -67,31 +67,43 @@ $(document).ready(function () {
   resetImgs = resetImgs.split(",");
 
   resetImgs.forEach((img, index) => {
+    //  setTimeout(() => {
     let carouselItemTemplate = document.getElementById("carouselItemTemplate")
       .children[0]; // .cloneNode(true)
     let newCarouselItem = carouselItemTemplate.cloneNode(true);
     let newClientCarouselItem = carouselItemTemplate.cloneNode(true);
 
     // let serverImg =   "/images/resetImgs/" + img.trim();
-    let googleDriveImg = img;
+    //let googleDriveImg = img;
     //  console.log(googleDriveImg);
     //  console.log("img ", img, " times ", index);
     newCarouselItem.getElementsByTagName("img")[0].src = img;
+    // console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    // get /proxy
+    //   $.ajax({
+    //     url: "/proxy",
+    //     type: "GET",
+    //     data: { url: googleDriveImg },
+    //     success: function (data) {
+    //       console.log("data");
+    //       console.log(data);
+    //       googleDriveImg = data;
+    //       data = data.replace("data:image/jpeg;base64,", "");
+    //       data = data.replace("data:image/png;base64,", "");
 
-    //get /proxy
-    // $.ajax({
-    //   url: "/proxy",
-    //   type: "GET",
-    //   data: { url: googleDriveImg },
-    //   success: function (data) {
-    //     console.log("data");
-    //     // newCarouselItem.getElementsByTagName("img")[0].src = data;
-    //   },
-    //   error: function (err) {
-    //     console.log("err", err);
-    //   },
-    // });
-
+    //       newCarouselItem.getElementsByTagName("img")[0].src = googleDriveImg;
+    //       ///let buffer = Buffer.from(data, "base64");
+    //       // console.log("buffer", buffer);
+    //       //data stream to base64
+    //       //https://stackoverflow.com/questions/20267939/nodejs-write-base64-image-file
+    //       //https://stackoverflow.com/questions/6150289/how-to-convert-image-into-base64-string-using-javascript
+    //     },
+    //     error: function (err) {
+    //       console.log("err", err);
+    //     },
+    //   });
+    // console.log("googleDriveImg", googleDriveImg);
+    //   newCarouselItem.getElementsByTagName("img")[0].src = googleDriveImg;
     newClientCarouselItem.getElementsByTagName("img")[0].src =
       "./images/placeholder-400X200.png";
 
@@ -105,6 +117,7 @@ $(document).ready(function () {
     document
       .getElementById("innerClientCarousel")
       .appendChild(newClientCarouselItem);
+    //  }, index * 1000 * 5);
   });
 
   document.getElementById("submitPictures").addEventListener("click", (e) => {

@@ -16,6 +16,10 @@ const { google } = require("googleapis");
 const { Blob } = require("node:buffer");
 const fetch = require("node-fetch"); // To pipe received image back to caller
 const cors = require("cors");
+var request = require("request").defaults({ encoding: null });
+const axios = require("axios");
+//const stream = require("stream"); // Added
+const { Readable } = require("stream");
 //clues link
 //https://drive.google.com/drive/folders/1Pc5zamgYqkDYvIRL1jQGmHDp57bxg_tC?usp=share_link
 
@@ -675,7 +679,7 @@ app.get("/reset", (req, res) => {
     //   auth: authClient,
     // });
     const drive = google.drive({
-      version: "v3",
+      version: "v2",
       auth: authClient,
     });
     //https://stackoverflow.com/questions/49099248/upload-image-to-heroku-with-node-and-get-its-url
@@ -683,14 +687,41 @@ app.get("/reset", (req, res) => {
 
     // https://gist.github.com/Musinux/9945da1a2afd284cef5ec0377f4b2460
     let filesList = await drive.files.list({
-      //fileId: "1mOyL_hVrm5YQSQ3wP2iWXfbkZwnuO91s",
+      // fileId: "1cJZYX4DXZkQN3O55r53WtA4kZzavJ6rf",
       q: `'${"1mOyL_hVrm5YQSQ3wP2iWXfbkZwnuO91s"}' in parents`,
+      // alt: "media",
+      //fields: "id,name, webContentLink",
+    });
+    //  console.log(filesList);
+    let fileItems = filesList.data.items;
+    //console("fileItems ", fileItems);
+    let filesGet = await drive.files.get({
+      fileId: "1cJZYX4DXZkQN3O55r53WtA4kZzavJ6rf",
+      //q: `'${"1mOyL_hVrm5YQSQ3wP2iWXfbkZwnuO91s"}' in parents`,
       // alt: "media",
       //fields: "id,name",
     });
-    //  console.log(filesList);
 
-    let fileItems = filesList.data.files;
+    // var dest = fs.createWriteStream("./resources/dank.png"); // Please set the filename of the saved file.
+    // drive.files.get(
+    //   { fileId: "1cJZYX4DXZkQN3O55r53WtA4kZzavJ6rf", alt: "media" },
+    //   { responseType: "stream" },
+    //   (err, { data }) => {
+    //     if (err) {
+    //       console.log(err);
+    //       return;
+    //     }
+    //     data
+    //       .on("end", () => console.log("Done."))
+    //       .on("error", (err) => {
+    //         console.log(err);
+    //         return process.exit();
+    //       })
+    //       .pipe(dest);
+    //   }
+    // );
+
+    //console.log("ist ", filesList.data);
     let picturesUrl = [];
     fileItems.forEach((fileItem) => {
       picturesUrl.push(
@@ -703,9 +734,55 @@ app.get("/reset", (req, res) => {
     // dlUrl = filesList.data.items[0].downloadUrl;
     //dowlnoad file from dlUrl link
 
+    async function getResetImages() {
+      const auth = new google.auth.GoogleAuth({
+        keyFilename: "driveCreds.json",
+        scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+      });
+      const authClient = await auth.getClient();
+
+      const drive = google.drive({
+        version: "v2",
+        auth: authClient,
+      });
+      let filesList = await drive.files.list({
+        q: `'${"1mOyL_hVrm5YQSQ3wP2iWXfbkZwnuO91s"}' in parents`,
+      });
+
+      // console.log(filesList.data.items[0].downloadUrl);
+      //let picturesUrl = [];
+      let dataArray = [];
+      filesList.data.items.forEach((fileItem) => {
+        //console.log("dl ", i, " ", fileItem);
+        // picturesUrl.push(
+        //   "https://docs.google.com/uc?id=" + fileItem.id + "&export=download"
+        // );
+        //"https://docs.google.com/uc?id=1zfzYmgZEUf__eSawVwsJHQlQ0ZpfOwWt&export=download",
+        async function syncer(fileId) {
+          let image = await axios.get(
+            "https://docs.google.com/uc?id=" + fileId + "&export=download",
+            {
+              responseType: "arraybuffer",
+            }
+          );
+          let returnedB64 = Buffer.from(image.data).toString("base64");
+          returnedB64 = "data:image/png;base64," + returnedB64;
+          //   console.log("returnedB64 ", returnedB64);
+          let data = returnedB64;
+          //res.send(data);
+          //return data
+
+          return dataArray.push(data);
+        }
+        return syncer(fileItem.id);
+      });
+    }
+    let resetImgs = getResetImages();
+
+    // console.log("resetImgs ", resetImgs[0]);
     let dlUrl = picturesUrl.toString();
-    let resetImgs = fs.readdirSync("./public/images/resetImgs");
-    console.log(resetImgs[0]);
+    // let resetImgs = fs.readdirSync("./public/images/resetImgs");
+    // console.log(resetImgs[0]);
     //  console.log("dlurl", dlUrl);
     res.render("reset", {
       customHead: resetHead,
@@ -718,12 +795,19 @@ app.get("/reset", (req, res) => {
 });
 
 app.post("/download", (req, res) => {
-  console.log("download", req.body.url);
+  //console.log("download", req.body.url);
   let base64Data = req.body.url.split(",")[1];
+  console.log("type " + req.body.url.split(",")[0]);
   let buff = Buffer.from(base64Data, "base64");
-  fs.writeFileSync("./resources/newfile.png", buff);
+  //   const bs = new stream.PassThrough(); // Added
+  //   bs.end(buff);
+  //fs.writeFileSync("./resources/newfile.png", buff);
 
-  async function customerImgsToDrive(number) {
+  async function customerImgsToDrive(buffer, number) {
+    //let buff = Buffer.from(data64, "base64");
+    // const bs = new stream.PassThrough(); // Added
+    // bs.end(buff);
+
     //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
     const auth = new google.auth.GoogleAuth({
       keyFilename: "driveCreds.json",
@@ -748,7 +832,9 @@ app.post("/download", (req, res) => {
     };
     const media = {
       mimeType: "image/png",
-      body: fs.createReadStream("./resources/newfile.png"),
+      //body: fs.createReadStream("./resources/newfile.png"),
+      //https://stackoverflow.com/questions/13230487/converting-a-buffer-into-a-readablestream-in-node-js
+      body: Readable.from(buffer),
     };
     try {
       const file = await drive.files.create({
@@ -772,22 +858,88 @@ app.post("/download", (req, res) => {
       throw err;
     }
   }
-  customerImgsToDrive(req.body.number);
+  customerImgsToDrive(buff, req.body.number);
 });
-
+//1cJZYX4DXZkQN3O55r53WtA4kZzavJ6rf
 // GET request to serve as proxy for images
-app.get("/proxy", (req, res) => {
-  let tester =
-    "https://docs.google.com/uc?id=1zfzYmgZEUf__eSawVwsJHQlQ0ZpfOwWt&export=download";
-  // let trimmedUrl = req.query.url.replace(" ", "");
-  console.log("proxy", req.query.url);
-  const url = req.query.url;
-  if (url && url.length > 0) {
-    fetch(tester)
-      .then((res) => res.body.pipe(res))
-      .catch((err) => console.log(err));
-  }
-});
+// app.get("/proxy", (req, res) => {
+//   console.log("proxy");
+
+//   const auth = new google.auth.GoogleAuth({
+//     keyFilename: "driveCreds.json",
+//     scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+//   });
+//   const authClient = await auth.getClient();
+
+//   const drive = google.drive({
+//     version: "v2",
+//     auth: authClient,
+//   });
+//    let filesList = await drive.files.list({
+//     q: `'${"1mOyL_hVrm5YQSQ3wP2iWXfbkZwnuO91s"}' in parents`,
+//     });
+
+//   console.log(filesList.data.items[0].downloadUrl)
+// let picturesUrl = [];
+// let dataArray = [];
+//   filesList.data.items.forEach((fileItem) => {
+//     console.log('dl ', i, " ", fileItem.downloadUrl);
+//     picturesUrl.push(
+//       " https://docs.google.com/uc?id=" + fileItem.id + "&export=download"
+//     );
+
+//   async function syncer() {
+//     let image = await axios.get(
+//       "https://docs.google.com/uc?id=1zfzYmgZEUf__eSawVwsJHQlQ0ZpfOwWt&export=download",
+//       {
+//         responseType: "arraybuffer",
+//       }
+//     );
+//     let returnedB64 = Buffer.from(image.data).toString("base64");
+//     returnedB64 = "data:image/png;base64," + returnedB64;
+//     console.log("returnedB64 ", returnedB64);
+//     let data = returnedB64;
+//     res.send(data);
+//   }
+//   syncer();
+// });
+//   // res.send(data);
+//   //  }
+// });
+// let trimmedUrl = req.query.url.replace(" ", "");
+//console.log("proxy", req.query.url);
+//   const url = req.query.url;
+//   if (url && url.length > 0) {
+//     fetch(tester)
+//       .then((response) => {
+//         let testData = "";
+//         response.body.pipe(testData);
+//         let buff = Buffer.from(testData, "base64");
+//         console.log(buff);
+//         res.send(buff);
+//       })
+//       .catch((err) => console.log(err));
+//   }
+//});
+
+// console.log("proxy");
+// let tester =
+//   "https://docs.google.com/uc?id=1zfzYmgZEUf__eSawVwsJHQlQ0ZpfOwWt&export=download";
+//let tester =
+//  "https://docs.google.com/uc?id=1cJZYX4DXZkQN3O55r53WtA4kZzavJ6rf&export=download";
+// request.get(tester, function (error, response, body) {
+//   //let buffy = Buffer.from(body, "base64");
+//   //  console.log(buffy);
+//   //   if (!error && response.statusCode == 200) {
+//   console.log("ining");
+
+//   let data =
+//     "data:" +
+//     response.headers["content-type"] +
+//     ";base64," +
+//     Buffer.from(body, "base64");
+//   console.log("ten", data);
+//});
 
 app.get("/admin", (req, res) => {
   res.render("admin", { customHead: adminHead, gameData: gameread });
