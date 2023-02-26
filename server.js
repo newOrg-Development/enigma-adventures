@@ -688,7 +688,7 @@ app.get("/reset", (req, res) => {
       // alt: "media",
       //fields: "id,name",
     });
-    console.log(filesList);
+    //  console.log(filesList);
 
     let fileItems = filesList.data.files;
     let picturesUrl = [];
@@ -706,7 +706,7 @@ app.get("/reset", (req, res) => {
     let dlUrl = picturesUrl.toString();
     let resetImgs = fs.readdirSync("./public/images/resetImgs");
     console.log(resetImgs[0]);
-    console.log("dlurl", dlUrl);
+    //  console.log("dlurl", dlUrl);
     res.render("reset", {
       customHead: resetHead,
       resetImgs: resetImgs,
@@ -715,6 +715,64 @@ app.get("/reset", (req, res) => {
     // return filesList.data.items[0].downloadUrl;
   }
   driver();
+});
+
+app.post("/download", (req, res) => {
+  console.log("download", req.body.url);
+  let base64Data = req.body.url.split(",")[1];
+  let buff = Buffer.from(base64Data, "base64");
+  fs.writeFileSync("./resources/newfile.png", buff);
+
+  async function customerImgsToDrive(number) {
+    //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
+    const auth = new google.auth.GoogleAuth({
+      keyFilename: "driveCreds.json",
+      // Scopes can be specified either as an array or as a single, space-delimited string.
+      scopes: ["https://www.googleapis.com/auth/drive"],
+    });
+    const authClient = await auth.getClient();
+
+    // const client = await docs.docs({
+    //   version: "v3",
+    //   auth: authClient,
+    // });
+    const drive = google.drive({
+      version: "v3",
+      auth: authClient,
+    });
+    //1ToI5wBPtxi9e0mvoIKzF8u_hB2aFEiGF
+    const fileMetadata = {
+      name: "clientPhoto" + number + ".png",
+      //q: `'${"1ToI5wBPtxi9e0mvoIKzF8u_hB2aFEiGF"}' in parents`,
+      parents: ["1ToI5wBPtxi9e0mvoIKzF8u_hB2aFEiGF"],
+    };
+    const media = {
+      mimeType: "image/png",
+      body: fs.createReadStream("./resources/newfile.png"),
+    };
+    try {
+      const file = await drive.files.create({
+        resource: fileMetadata,
+        media: media,
+        fields: "id",
+      });
+      console.log("File Id:", file.data.id);
+      let sender = file.data;
+
+      //   let filesList = await drive.files.get({
+      //     fileId: "16kYnpSOFnSK-a0o4guIFCbReRuvFwlIA",
+      //     // alt: "media",
+      //     fields: "id,name,parents",
+      //   });
+
+      //   res.send(filesList);
+      return file.data.id;
+    } catch (err) {
+      // TODO(developer) - Handle error
+      throw err;
+    }
+  }
+  customerImgsToDrive(req.body.number);
 });
 
 // GET request to serve as proxy for images

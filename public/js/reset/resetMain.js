@@ -65,10 +65,6 @@ $(document).ready(function () {
   let resetImgs = document.getElementById("dlUrl").innerText;
   resetImgs = resetImgs.trim();
   resetImgs = resetImgs.split(",");
-  console.log(resetImgs);
-  // let resetImgs = document.getElementById("resetImgs").innerText;
-  console.log(resetImgs);
-  //resetImgs = resetImgs.split(",");
 
   resetImgs.forEach((img, index) => {
     let carouselItemTemplate = document.getElementById("carouselItemTemplate")
@@ -78,8 +74,8 @@ $(document).ready(function () {
 
     // let serverImg =   "/images/resetImgs/" + img.trim();
     let googleDriveImg = img;
-    console.log(googleDriveImg);
-    console.log("img ", img, " times ", index);
+    //  console.log(googleDriveImg);
+    //  console.log("img ", img, " times ", index);
     newCarouselItem.getElementsByTagName("img")[0].src = img;
 
     //get /proxy
@@ -111,7 +107,52 @@ $(document).ready(function () {
       .appendChild(newClientCarouselItem);
   });
 
-  // Select elemetns
+  document.getElementById("submitPictures").addEventListener("click", (e) => {
+    //function sendImages() {
+    let innerClientCarouselChildren = document.getElementById(
+      "innerClientCarousel"
+    ).children;
+    for (let i = 0; i < innerClientCarouselChildren.length; i++) {
+      let clientImg =
+        innerClientCarouselChildren[i].getElementsByTagName("img")[0].src;
+      console.log("img", clientImg);
+      function toDataURL(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          var reader = new FileReader();
+          reader.onloadend = function () {
+            callback(reader.result);
+          };
+          reader.readAsDataURL(xhr.response);
+        };
+        xhr.open("GET", url);
+        xhr.responseType = "blob";
+        xhr.send();
+      }
+
+      toDataURL(clientImg, function (dataUrl) {
+        console.log("RESULT:", dataUrl);
+
+        //console.log("firstImg", firstImg);
+        $.ajax({
+          url: "/download",
+          type: "POST",
+          data: { url: dataUrl, number: i + 1 },
+          success: function (data) {
+            console.log("data");
+            console.log(data);
+          },
+          error: function (err) {
+            console.log("err", err);
+          },
+        });
+      });
+    }
+
+    // sendImages();
+  });
+
+  //setTimeout(sendImages, 5000);
 
   // Navigator video stream
   var video = document.getElementById("video");
