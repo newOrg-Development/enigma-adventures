@@ -1,5 +1,6 @@
 //import { hinter } from "./getHint.js";
 $(document).ready(function () {
+  //$("#clueModal").modal("show");
   //toggle display for signUphidder with qrCodeData is signUp
 
   document.getElementById("qrCodeData").addEventListener("change", function () {
@@ -241,15 +242,15 @@ $(document).ready(function () {
     } else {
       // console.log("qrCodeData: " + qrCodeData);
       let session = document.getElementById("sessionData").innerText;
-      session = JSON.parse(session);
-      let uuid = session.uuid;
+      //session = JSON.parse(session);
+      // let uuid = session.uuid;
+      let uuid = "dev";
       let timestamp = session.timestamp;
       let teamName = session.teamName;
       let cluesUsed = session.cluesUsed;
-      if (uuid == undefined) {
-        uuid = "";
-      }
-      if (qrCodeData == "hint" && uuid != "") {
+      if (uuid == undefined || uuid == null || uuid == "") {
+        alert("You must be logged in to get a hint");
+      } else if (qrCodeData == "hint") {
         //hinter();
         $.ajax({
           type: "POST",
@@ -271,32 +272,6 @@ $(document).ready(function () {
             }
           },
         });
-      } else if (qrCodeData == "email") {
-        $.ajax({
-          type: "POST",
-          url: "/email",
-          data: {
-            teamName: teamName,
-            teamEmail: teamEmail,
-            //teamPassword: teamPassword,
-            qrCodeData: qrCodeData,
-          },
-          success: function (msg) {
-            if (msg == "false") {
-            } else {
-              // $("#success-saved").removeAttr("hidden");
-              // $("#success-saved").show("fade");
-              // document.getElementById("alert-successsaveClose").onclick =
-              //   function () {
-              //     document
-              //       .getElementById("success-saved")
-              //       .setAttribute("hidden", "true");
-              //   };
-            }
-          },
-        });
-      } else if (qrCodeData == "hint" && uuid == "") {
-        alert("You must be logged in to get a hint");
       } else if (qrCodeData == "gameEnd") {
         $.ajax({
           type: "POST",
@@ -318,6 +293,28 @@ $(document).ready(function () {
               //       .getElementById("success-saved")
               //       .setAttribute("hidden", "true");
               //   };
+            }
+          },
+        });
+      } else if (qrCodeData == "clue") {
+        $.ajax({
+          type: "GET",
+          url: "/clue",
+          data: {
+            uuid,
+          },
+          success: function (linkPairs) {
+            if (linkPairs == "false") {
+            } else {
+              linkPairs.forEach((linkPair) => {
+                if (linkPair[0].includes("clue1.mp4")) {
+                  console.log("clue: " + linkPair);
+                  document.getElementById("clueIframe").src = linkPair[1];
+                  $("#clueModal").modal("show");
+                }
+              });
+
+              // "https://drive.google.com/file/d/1E7o8MhhCF9al7htnPtryJvnjbFNBWMnd/preview?usp=drivesdk"
             }
           },
         });

@@ -416,16 +416,12 @@ const resetHead = module.require("./views/custom/resetHead.hbs");
 
 const emailRouter = require("./routes/email");
 const adminRouter = require("./routes/admin");
-//const magicLinkRouter = require("./routes/magicLink");
-
 const { Session } = require("inspector");
 const { file } = require("googleapis/build/src/apis/file");
 
 app.use("/email", emailRouter);
 
 let gameread = fs.readFileSync("./gameData/gameData.txt");
-//gameread = JSON.parse(gameread);
-console.log("gameread: " + gameread);
 
 app.get("/", (req, res) => {
   session = req.session;
@@ -439,8 +435,6 @@ app.get("/", (req, res) => {
 
 app.get("/leaderboard", (req, res) => {
   getLeaderboard().then((data) => {
-    console.log("data: " + data);
-
     res.render("leaderboard", {
       customHead: leaderboardHead,
       leaderboardData: data,
@@ -448,62 +442,39 @@ app.get("/leaderboard", (req, res) => {
   });
 });
 
-// teamName: teamName,
-// teamEmail: teamEmail,
-// teamPassword: teamPassword,
-// qrCodeData: qrCodeData,
-// username: "user1",
-// password: "mypassword",
 app.get("/magicLink", (req, res) => {
-  console.log("uuid " + req.query.uuid);
   getGameStates().then((data) => {
-    //console.log("data: " + data);
-
     data.split("&&").forEach((gameState) => {
       if (gameState.includes(req.query.uuid)) {
         let gameStateParams = gameState.split(";");
         console.log("got it");
         session = req.session;
-        //session.userid = req.body.username;
         session.uuid = gameStateParams[0];
         session.teamName = gameStateParams[1];
         session.teamEmail = gameStateParams[2];
         session.cluesUsed = gameStateParams[3];
         session.timestamp = gameStateParams[4];
-        //  let uuid = uuidv4();
-
-        // session.env = process.env.NODE_ENV;
 
         res.render("home", {
           customHead: mainHead,
           sessionData: JSON.stringify(req.session),
         });
       }
-      //data = JSON.stringify(data);
     });
   });
 });
 
 app.post("/updateHint", (req, res) => {
-  //console.log("uiid" + req.body.uuid);
   let uuid = req.body.uuid;
   getGameStates().then((data) => {
-    //console.log("data: " + data);
     let newHintsNumber = 0;
     let newGameStates = [];
-
     newGameStates = data.split("&&");
-    //  console.log("newGameStates tt" + newGameStates);
-    //newGameStates.forEach((gameState) => {
 
     data.split("&&").forEach((gameState, index) => {
-      //console.log("checking", uuid);
       if (gameState.includes(uuid)) {
-        //   console.log("found it");
         let gameStateParams = gameState.split(";");
-
         let newGameStateParams = "";
-
         gameStateParams.forEach((param, index2) => {
           if (index2 != 3) {
             if (gameStateParams.length - 1 == index2) {
@@ -511,43 +482,52 @@ app.post("/updateHint", (req, res) => {
             } else {
               newGameStateParams += param + ";";
             }
-
             newGameStates[index] = newGameStateParams;
           } else {
-            //console.log("param " + param);
             newGameStateParams += parseInt(param) + 1 + ";" + param;
             newGameStates[index] = newGameStateParams;
-            //  console.log("newGameStates " + newGameStates);
             updateGameStates(newGameStates);
           }
         });
       }
     });
-    //     let currentHints = parseInt(gameStateParams[3]);
-    //     newHintsNumber = currentHints++;
-    //   }
-    // });
-    // console.log("presplit " + data);
-    // let games = data.split("&&");
-    // games.forEach((game) => {
-    //     if(game.includes(req.query.uuid)){
-    //         game
-    //     }
-    // console.log("tempData " + tempData.length);
-    // let tempData2 = tempData[1].split(";");
-    // let newGameStates =
-    //   tempData[0] +
-    //   req.query.uuid +
-    //   ";" +
-    //   tempData2[1] +
-    //   ";" +
-    //   tempData2[2] +
-    //   ";" +
-    //   newHintsNumber +
-    //   "&&" +
-    //   tempData[2];
-    // console.log("newGameStates: " + newGameStates);
   });
+});
+
+app.get("/clue", (req, res) => {
+  async function getClues() {
+    const auth = new google.auth.GoogleAuth({
+      keyFilename: "driveCreds.json",
+      scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+    });
+    const authClient = await auth.getClient();
+    const drive = google.drive({
+      version: "v2",
+      auth: authClient,
+    });
+    //'1E7o8MhhCF9al7htnPtryJvnjbFNBWMnd
+    let filesList = await drive.files.list({
+      // fileId: "1E7o8MhhCF9al7htnPtryJvnjbFNBWMnd",
+      q: `'${"1quubXDC_7Uktspcp-Cjrja1Iwbj3wcBm"}' in parents`,
+      // alt: "media",
+      // fields: "webContentLink",
+    });
+    let fileItems = filesList.data.items;
+    console.log(fileItems);
+    let webContentLinkArray = [];
+    //  webContentLinkArray.push(fileItems.items[0].embedLink);
+    fileItems.forEach((fileItem) => {
+      let linkPair = [];
+      linkPair.push(fileItem.title);
+      linkPair.push(fileItem.embedLink);
+      webContentLinkArray.push(linkPair);
+    });
+    console.log("webContentLinkArray: " + webContentLinkArray);
+    res.send(webContentLinkArray);
+  }
+  getClues();
+
+  console.log("getting clue");
 });
 
 app.post("/gameEnd", (req, res) => {
@@ -651,7 +631,6 @@ app.post("/signUp", (req, res) => {
         ";" +
         req.body.timestamp
     );
-    console.log(req.session);
     res.send(req.session);
   } else {
     res.send("Invalid Email or Team Name");
@@ -692,47 +671,17 @@ app.get("/reset", (req, res) => {
       // alt: "media",
       //fields: "id,name, webContentLink",
     });
-    //  console.log(filesList);
     let fileItems = filesList.data.items;
-    //console("fileItems ", fileItems);
     let filesGet = await drive.files.get({
       fileId: "1cJZYX4DXZkQN3O55r53WtA4kZzavJ6rf",
-      //q: `'${"1mOyL_hVrm5YQSQ3wP2iWXfbkZwnuO91s"}' in parents`,
-      // alt: "media",
-      //fields: "id,name",
     });
 
-    // var dest = fs.createWriteStream("./resources/dank.png"); // Please set the filename of the saved file.
-    // drive.files.get(
-    //   { fileId: "1cJZYX4DXZkQN3O55r53WtA4kZzavJ6rf", alt: "media" },
-    //   { responseType: "stream" },
-    //   (err, { data }) => {
-    //     if (err) {
-    //       console.log(err);
-    //       return;
-    //     }
-    //     data
-    //       .on("end", () => console.log("Done."))
-    //       .on("error", (err) => {
-    //         console.log(err);
-    //         return process.exit();
-    //       })
-    //       .pipe(dest);
-    //   }
-    // );
-
-    //console.log("ist ", filesList.data);
     let picturesUrl = [];
     fileItems.forEach((fileItem) => {
       picturesUrl.push(
         " https://docs.google.com/uc?id=" + fileItem.id + "&export=download"
       );
     });
-    //   console.log(fileItem.title);
-    //   console.log(fileItem.id);
-    // });
-    // dlUrl = filesList.data.items[0].downloadUrl;
-    //dowlnoad file from dlUrl link
 
     async function getResetImages() {
       const auth = new google.auth.GoogleAuth({
