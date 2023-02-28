@@ -39,12 +39,10 @@ app.use(bodyParser.json({ limit: "10mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 
 const mainHead = module.require("./views/custom/mainHead.hbs");
-const adminHead = module.require("./views/custom/adminHead.hbs");
 const leaderboardHead = module.require("./views/custom/leaderboardHead.hbs");
 const resetHead = module.require("./views/custom/resetHead.hbs");
 
 const emailRouter = require("./routes/email");
-const adminRouter = require("./routes/admin");
 const homeRouter = require("./routes/homeRouter");
 
 app.use("/email", emailRouter);
