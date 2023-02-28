@@ -37,7 +37,15 @@ $(document).ready(function () {
     tr.appendChild(th);
     for (let i = 0; i < gameState.length; i++) {
       let td = document.createElement("td");
-      td.innerHTML = gameState[i];
+      if (gameState[i] == gameState[4]) {
+        let date = new Date(parseInt(gameState[i]));
+        let dateStr = date.toDateString();
+        let timeStr = date.toLocaleTimeString();
+        let dateTimeStr = dateStr + " " + timeStr;
+        td.innerHTML = dateTimeStr;
+      } else {
+        td.innerHTML = gameState[i];
+      }
       tr.appendChild(td);
     }
     table.getElementsByTagName("tbody")[0].appendChild(tr);
