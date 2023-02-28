@@ -1,22 +1,4 @@
-//https://web.dev/getusermedia-intro/
-
 $(document).ready(function () {
-  //get pictures from public\images\resetImgs
-
-  //   let carouselTemplate = document.getElementById(
-  //     "carouselItemTemplate"
-  //   ).innerHTML;
-  //   let dlUrl = document.getElementById("dlUrl").innerText;
-  //   console.log(dlUrl);
-  //   dlUrl = dlUrl.split(",");
-
-  //   //carousel change event
-
-  //   //download img from dlUrl
-
-  //   //display dlurl as img
-  //   document.getElementById("dlImg").src = dlUrl[0].trim();
-
   $("#carouselMain").on("slid.bs.carousel", function (e) {
     let innerCarouselChildren =
       document.getElementById("innerCarousel").children;
@@ -65,49 +47,15 @@ $(document).ready(function () {
   let resetImgs = document.getElementById("dlUrl").innerText;
   resetImgs = resetImgs.trim();
   resetImgs = resetImgs.split(",");
-
   resetImgs.forEach((img, index) => {
-    //  setTimeout(() => {
     let carouselItemTemplate = document.getElementById("carouselItemTemplate")
-      .children[0]; // .cloneNode(true)
+      .children[0];
     let newCarouselItem = carouselItemTemplate.cloneNode(true);
     let newClientCarouselItem = carouselItemTemplate.cloneNode(true);
-
-    // let serverImg =   "/images/resetImgs/" + img.trim();
-    //let googleDriveImg = img;
-    //  console.log(googleDriveImg);
-    //  console.log("img ", img, " times ", index);
     newCarouselItem.getElementsByTagName("img")[0].src = img;
-    // console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    // get /proxy
-    //   $.ajax({
-    //     url: "/proxy",
-    //     type: "GET",
-    //     data: { url: googleDriveImg },
-    //     success: function (data) {
-    //       console.log("data");
-    //       console.log(data);
-    //       googleDriveImg = data;
-    //       data = data.replace("data:image/jpeg;base64,", "");
-    //       data = data.replace("data:image/png;base64,", "");
-
-    //       newCarouselItem.getElementsByTagName("img")[0].src = googleDriveImg;
-    //       ///let buffer = Buffer.from(data, "base64");
-    //       // console.log("buffer", buffer);
-    //       //data stream to base64
-    //       //https://stackoverflow.com/questions/20267939/nodejs-write-base64-image-file
-    //       //https://stackoverflow.com/questions/6150289/how-to-convert-image-into-base64-string-using-javascript
-    //     },
-    //     error: function (err) {
-    //       console.log("err", err);
-    //     },
-    //   });
-    // console.log("googleDriveImg", googleDriveImg);
-    //   newCarouselItem.getElementsByTagName("img")[0].src = googleDriveImg;
     newClientCarouselItem.getElementsByTagName("img")[0].src =
-      "./images/placeholder-400X200.png";
+      "./images/placeholder.png";
 
-    //make the first image active
     if (index == 0) {
       newCarouselItem.classList.add("active");
       newClientCarouselItem.classList.add("active");
@@ -117,11 +65,9 @@ $(document).ready(function () {
     document
       .getElementById("innerClientCarousel")
       .appendChild(newClientCarouselItem);
-    //  }, index * 1000 * 5);
   });
 
   document.getElementById("submitPictures").addEventListener("click", (e) => {
-    //function sendImages() {
     let innerClientCarouselChildren = document.getElementById(
       "innerClientCarousel"
     ).children;
@@ -142,98 +88,56 @@ $(document).ready(function () {
         xhr.responseType = "blob";
         xhr.send();
       }
-
       toDataURL(clientImg, function (dataUrl) {
-        console.log("RESULT:", dataUrl);
-
-        //console.log("firstImg", firstImg);
         $.ajax({
           url: "/download",
           type: "POST",
           data: { url: dataUrl, number: i + 1 },
-          success: function (data) {
-            console.log("data");
-            console.log(data);
-          },
+          success: function (data) {},
           error: function (err) {
             console.log("err", err);
           },
         });
       });
     }
-
-    // sendImages();
   });
-
-  //setTimeout(sendImages, 5000);
-
-  // Navigator video stream
   var video = document.getElementById("video");
-  // var picture = document.getElementById("shot");
   async function videoStream() {
     try {
-      console.log(video);
-      //console.log(picture);
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment" },
         audio: false,
       });
-      // Set video source
       video.srcObject = stream;
-
-      //Take a picture on K press
       document.getElementById("takePicture").addEventListener("click", (e) => {
-        // console.log(e.code);
-        // const video = document.getElementById("video");
-        // const picture = document.getElementById("shot");
-        // Create a Canvas
         const canvas = document.createElement("canvas");
-        // Set canvas width and height
         canvas.width = video.width;
         canvas.height = video.height;
-        console.log("heights", canvas.width, canvas.height);
-        // Draw a new image
         canvas
           .getContext("2d")
           .drawImage(video, 0, 0, video.width, video.height);
-        // Take a shot
-        // console.log("vancs", canvas);
         let img = canvas
           .toDataURL("image/jpeg")
           .replace("image/jpeg", "image/octet-stream");
-        console.log("img", img);
-        // Set Image src
-        // picture.src = img;
-        // resetImgs.forEach((img, index) => {
         let carouselItemTemplate = document.getElementById(
           "carouselItemTemplate"
-        ).children[0]; // .cloneNode(true)
+        ).children[0];
         let newCarouselItem = carouselItemTemplate.cloneNode(true);
         console.log(newCarouselItem);
         newCarouselItem.getElementsByTagName("img")[0].src = img;
-        //   newCarouselItem.getElementsByTagName("img")[0].src =
-        //     "/images/resetImgs/" + img.trim();
-
-        //get the active carousel item from innerCarousel
         let innerCarouselChildren =
           document.getElementById("innerCarousel").children;
-
-        //check  carouselItems for active class
         for (let i = 0; i < innerCarouselChildren.length; i++) {
           if (innerCarouselChildren[i].classList.contains("active")) {
             {
               document
                 .getElementById("innerClientCarousel")
                 .children[i].getElementsByTagName("img")[0].src = img;
-              console.log("i", i);
-              //add active class
               let clientCarouselItems = document.getElementById(
                 "innerClientCarousel"
               ).children;
-              //check  carouselItems for active class
               for (let i = 0; i < clientCarouselItems.length; i++) {
                 if (clientCarouselItems[i].classList.contains("active")) {
-                  //remove active class
                   clientCarouselItems[i].classList.remove("active");
                 }
               }
@@ -241,40 +145,13 @@ $(document).ready(function () {
             }
           }
         }
-        //get all carousel items from innerClientCarousel
-
-        // let innerCarouselItems =
-        //   document.getElementById("innerCarousel").children;
-        // for (let i = 0; i < innerCarouselItems.length; i++) {
-        //   //add active class to last item
-        //   if (innerCarouselItems[i].classList.contains("active")) {
-        //     //remove active class
-        //     innerCarouselItems[i].classList.remove("active");
-        //   }
-        //   clientCarouselItems[clientCarouselItems.length - 1].classList.add(
-        //     "active"
-        //   );
-        //   innerCarouselItems[clientCarouselItems.length - 1].classList.add(
-        //     "active"
-        //   );
-        // }
-
-        //  });
-        // Save image file
-        // const anchorTag = document.createElement("a");
-        // anchorTag.href = img;
-        // anchorTag.download = "my-image.jpeg";
-        // document.body.appendChild(anchorTag);
-        // anchorTag.click();
       });
     } catch (err) {
       console.log(err);
     }
   }
-  // Run function
   document.getElementById("requestCam").addEventListener("click", (e) => {
     document.getElementById("videoDiv").style.display = "block";
     videoStream();
   });
-  //document.getElementById("requestCam").click();
 });

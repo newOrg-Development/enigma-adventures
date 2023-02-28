@@ -1,4 +1,3 @@
-<!-- Modal -->
 <div
   class="modal fade"
   id="clueModal"
@@ -23,14 +22,6 @@
       <div class="modal-body" id="clueModalBody">
         <iframe src="" title="Clue" id="clueIframe" allowfullscreen></iframe>
       </div>
-      {{! <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          data-bs-dismiss="modal"
-        >Close</button>
-       <button type="button" class="btn btn-primary">Understood</button> 
-      </div> }}
     </div>
   </div>
 </div>
@@ -52,7 +43,6 @@
         id="teamEmail"
         aria-describedby="emailHelp"
       />
-
     </div>
     <div class="form-check mb-4 mt-4" id="sendEmailDiv">
       <input class="form-check-input" type="checkbox" value="" id="sendEmail" />
@@ -62,15 +52,8 @@
     </div>
     <hr />
   </div>
-
-  {{! <div class="mb-3">
-    <label for="teamPassword" class="form-label">Password</label>
-    <input type="password" class="form-control" id="teamPassword" />
-  </div> }}
-
   <div class="mb-3">
     <label for="qrCodeData" class="form-label">Scanner Data</label>
-    {{! <input type="text" class="form-control" id="qrCodeData" value="hint" /> }}
     <select
       class="form-select"
       aria-label="Default select example"
@@ -83,27 +66,20 @@
     </select>
   </div>
 </form>
-
-{{! <div class="d-grid gap-2 mt-5">
-  <button class="btn btn-primary" type="button" id="signUp">Sign Up</button>
-</div> }}
-
 <div class="d-grid gap-2 mt-2">
   <button class="btn btn-primary" type="button" id="showScanner">Show/Hide
     Scanner</button>
 </div>
 
 <div class="mx-auto mt-2" style="width: 80%; display:none" id="scanner"></div>
-{{! <div id="qrCodeData"></div> }}
-
 <div class="d-grid gap-2 mt-2">
   <button class="btn btn-primary" type="button" id="submitData">
     Submit</button>
 </div>
 
-<div id="session">
-
-</div>
+{{!-- <div id="session">
+  {{{session}}}
+</div> --}}
 
 <div id="magicUrl">
 

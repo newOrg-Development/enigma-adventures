@@ -26,10 +26,7 @@ $(document).ready(function () {
     gameNumberSelect.add(option);
   }
 
-  //get selcted game number
   let gameNumberSelected = document.getElementById("gameNumber").value;
-
-  //populate puzzleNumber select with puzzle numbers
   let temperCounter = gameDataParsed[0][gameNumberSelected].length;
   let puzzleNumberSelect = document.getElementById("puzzleNumber");
   for (let i = 0; i < temperCounter; i++) {
@@ -52,14 +49,11 @@ $(document).ready(function () {
   document.getElementById("hint").value = hint;
 
   document.getElementById("gameNumber").addEventListener("change", function () {
-    // let gameDataParsed = JSON.parse(gameData);
     console.log(gameDataParsed);
     let gameNumberSelected = document.getElementById("gameNumber").value;
     console.log("gameNumberSelected: " + gameNumberSelected);
     let puzzleNumberSelect = document.getElementById("puzzleNumber");
-    //remove all options
     puzzleNumberSelect.innerHTML = "";
-
     let temperCounter = gameDataParsed[gameNumberSelected - 1].length;
     console.log("temperCounter: " + temperCounter);
     for (let i = 0; i < temperCounter; i++) {
@@ -68,12 +62,8 @@ $(document).ready(function () {
       option.value = i + 1;
       puzzleNumberSelect.add(option);
     }
-
-    //get hints
     let hintNumberSelect = document.getElementById("hintNumber");
-    //remove all options
     hintNumberSelect.innerHTML = "";
-
     let puzzlesArr = gameDataParsed[gameNumberSelected - 1][0];
     console.log("temperCounter2: " + puzzlesArr);
     for (let i = 0; i < puzzlesArr.length; i++) {
@@ -82,8 +72,6 @@ $(document).ready(function () {
       option.value = i + 1;
       hintNumberSelect.add(option);
     }
-
-    //get hint
     let hint = gameDataParsed[gameNumberSelected - 1][0][0];
     console.log("hint: " + hint);
     document.getElementById("hint").value = hint;
@@ -95,9 +83,7 @@ $(document).ready(function () {
       let gameNumberSelected = document.getElementById("gameNumber").value;
       let puzzleNumberSelected = document.getElementById("puzzleNumber").value;
       let hintNumberSelect = document.getElementById("hintNumber");
-      //remove all options
       hintNumberSelect.innerHTML = "";
-
       let puzzlesArr =
         gameDataParsed[gameNumberSelected - 1][puzzleNumberSelected - 1];
       for (let i = 0; i < puzzlesArr.length; i++) {
@@ -106,7 +92,6 @@ $(document).ready(function () {
         option.value = i + 1;
         hintNumberSelect.add(option);
       }
-
       let hint =
         gameDataParsed[gameNumberSelected - 1][puzzleNumberSelected - 1][0];
       document.getElementById("hint").textContent = hint;
@@ -144,10 +129,8 @@ $(document).ready(function () {
     resetGameHintData(gameDataParsed);
   });
   document.getElementById("addPuzzle").addEventListener("click", function () {
-    //get game
     let gameNumber = document.getElementById("gameNumber").value;
     gameDataParsed[gameNumber - 1].push([]);
-
     resetGameHintData(gameDataParsed);
   });
 
