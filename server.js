@@ -231,7 +231,6 @@ app.get("/admin", (req, res) => {
   res.render("admin", { customHead: adminHead, gameData: gameread });
 });
 
-app.use("/admin", adminRouter);
 if (process.env.NODE_ENV === "development") {
   console.log("development mode");
   options = {
