@@ -17,7 +17,13 @@ const oneDay = 1000 * 60 * 60 * 24;
 
 var env = process.env.NODE_ENV;
 console.log(`env is ${env}`);
-var googleCreds = process.env.GOOGLE_API_KEY;
+let googleCreds = "";
+if (env === "development") {
+  googleCreds = "./credentials.json";
+} else {
+  googleCreds = process.env.GOOGLE_API_KEY;
+}
+
 app.use(
   session({
     secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
@@ -108,7 +114,7 @@ app.get("/reset", (req, res) => {
   async function driver() {
     //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
     const auth = new google.auth.GoogleAuth({
-      keyFilename: googleCreds,
+      keyFile: googleCreds,
       scopes: ["https://www.googleapis.com/auth/drive.readonly"],
     });
     const authClient = await auth.getClient();
@@ -137,7 +143,7 @@ app.get("/reset", (req, res) => {
 
     async function getResetImages() {
       const auth = new google.auth.GoogleAuth({
-        keyFilename: googleCreds,
+        keyFile: googleCreds,
         scopes: ["https://www.googleapis.com/auth/drive.readonly"],
       });
       const authClient = await auth.getClient();
@@ -191,7 +197,7 @@ app.post("/download", (req, res) => {
   async function customerImgsToDrive(buffer, number) {
     //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
     const auth = new google.auth.GoogleAuth({
-      keyFilename: googleCreds,
+      keyFile: googleCreds,
       scopes: ["https://www.googleapis.com/auth/drive"],
     });
     const authClient = await auth.getClient();
