@@ -21,7 +21,7 @@ let googleCreds = "";
 if (env === "development") {
   googleCreds = "./credentials.json";
 } else {
-  googleCreds = process.env.GOOGLE_API_KEY;
+  googleCreds = process.env.GOOGLE_APPLICATION_CREDENTIALS;
 }
 
 app.use(
