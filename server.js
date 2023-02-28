@@ -50,6 +50,7 @@ const mainHead = module.require("./views/custom/mainHead.hbs");
 const leaderboardHead = module.require("./views/custom/leaderboardHead.hbs");
 const resetHead = module.require("./views/custom/resetHead.hbs");
 const adminHead = module.require("./views/custom/adminHead.hbs");
+const gamesViewerHead = module.require("./views/custom/gamesViewerHead.hbs");
 
 const emailRouter = require("./routes/email");
 const homeRouter = require("./routes/homeRouter");
@@ -82,6 +83,15 @@ app.get("/leaderboard", (req, res) => {
     res.render("leaderboard", {
       customHead: leaderboardHead,
       leaderboardData: data,
+    });
+  });
+});
+
+app.get("/gamesViewer", (req, res) => {
+  googleController.getGameStates().then((gameStates) => {
+    res.render("gamesViewer", {
+      customHead: gamesViewerHead,
+      gameStates: gameStates,
     });
   });
 });
