@@ -1,3 +1,4 @@
+node_modules
 cert.crt
 cert.key
 credentials.json
