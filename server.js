@@ -15,9 +15,9 @@ const googleController = require("./routes/googleContoller.js");
 
 const oneDay = 1000 * 60 * 60 * 24;
 
-let env = process.env.NODE_ENV;
+var env = process.env.NODE_ENV;
 console.log(`env is ${env}`);
-let googleCreds = process.env.GOOGLE_CREDS;
+var googleCreds = process.env.GOOGLE_API_KEY;
 app.use(
   session({
     secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
