@@ -1,9 +1,12 @@
 const docs = require("@googleapis/docs");
 const { google } = require("googleapis");
+//googleCreds
+let googleCreds = process.env.GOOGLE_CREDS;
 async function docer(input) {
   //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
   const auth = new docs.auth.GoogleAuth({
-    keyFilename: "credentials.json",
+    //keyFilename: "credentials.json",
+    keyFilename: googleCreds,
     // Scopes can be specified either as an array or as a single, space-delimited string.
     scopes: ["https://www.googleapis.com/auth/documents"],
   });
@@ -42,7 +45,8 @@ async function docer(input) {
 async function getLeaderboard() {
   //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
   const auth = new docs.auth.GoogleAuth({
-    keyFilename: "credentials.json",
+    //keyFilename: "credentials.json",
+    keyFilename: googleCreds,
     // Scopes can be specified either as an array or as a single, space-delimited string.
     scopes: ["https://www.googleapis.com/auth/documents"],
   });
@@ -69,7 +73,8 @@ async function getLeaderboard() {
 async function updateLeaderboard(input) {
   //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
   const auth = new docs.auth.GoogleAuth({
-    keyFilename: "credentials.json",
+    //keyFilename: "credentials.json",
+    keyFilename: googleCreds,
     scopes: ["https://www.googleapis.com/auth/documents"],
   });
   const authClient = await auth.getClient();
@@ -119,7 +124,8 @@ async function updateLeaderboard(input) {
 async function getGameStates() {
   //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
   const auth = new docs.auth.GoogleAuth({
-    keyFilename: "credentials.json",
+    //keyFilename: "credentials.json",
+    keyFilename: googleCreds,
     scopes: ["https://www.googleapis.com/auth/documents"],
   });
   const authClient = await auth.getClient();
@@ -143,7 +149,8 @@ async function getGameStates() {
 
 async function updateGameStates(input) {
   const auth = new docs.auth.GoogleAuth({
-    keyFilename: "credentials.json",
+    //keyFilename: "credentials.json",
+    keyFilename: googleCreds,
     scopes: ["https://www.googleapis.com/auth/documents"],
   });
   const authClient = await auth.getClient();

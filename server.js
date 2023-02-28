@@ -6,8 +6,7 @@ const bodyParser = require("body-parser");
 const fs = require("fs");
 const session = require("express-session");
 require("dotenv").config();
-var env = process.env.NODE_ENV;
-console.log(`env is ${env}`);
+
 const { google } = require("googleapis");
 const cors = require("cors");
 const axios = require("axios");
@@ -16,6 +15,9 @@ const googleController = require("./routes/googleContoller.js");
 
 const oneDay = 1000 * 60 * 60 * 24;
 
+let env = process.env.NODE_ENV;
+console.log(`env is ${env}`);
+let googleCreds = process.env.GOOGLE_CREDS;
 app.use(
   session({
     secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
@@ -106,7 +108,7 @@ app.get("/reset", (req, res) => {
   async function driver() {
     //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
     const auth = new google.auth.GoogleAuth({
-      keyFilename: "driveCreds.json",
+      keyFilename: googleCreds,
       scopes: ["https://www.googleapis.com/auth/drive.readonly"],
     });
     const authClient = await auth.getClient();
@@ -135,7 +137,7 @@ app.get("/reset", (req, res) => {
 
     async function getResetImages() {
       const auth = new google.auth.GoogleAuth({
-        keyFilename: "driveCreds.json",
+        keyFilename: googleCreds,
         scopes: ["https://www.googleapis.com/auth/drive.readonly"],
       });
       const authClient = await auth.getClient();
@@ -189,7 +191,7 @@ app.post("/download", (req, res) => {
   async function customerImgsToDrive(buffer, number) {
     //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
     const auth = new google.auth.GoogleAuth({
-      keyFilename: "driveCreds.json",
+      keyFilename: googleCreds,
       scopes: ["https://www.googleapis.com/auth/drive"],
     });
     const authClient = await auth.getClient();
