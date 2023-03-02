@@ -45,11 +45,13 @@ $(document).ready(function () {
             month = "" + (d.getMonth() + 1),
             day = "" + d.getDate(),
             year = d.getFullYear();
+          //take first 2 letters off year
+          year = year.toString().slice(2);
 
           if (month.length < 2) month = "0" + month;
           if (day.length < 2) day = "0" + day;
 
-          return [year, month, day].join("/");
+          return [day, month, year].join("/");
         }
         let dateStrParsed = formatDate(dateStr);
 
