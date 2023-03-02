@@ -11,7 +11,7 @@ router.post("/saveHintArray", (req, res) => {
   let gameHintArray = req.body.gameHintArray;
 
   googleController.saveGameHints(gameHintArray).then((data) => {
-    res.send(data);
+    res.send("done");
   });
 });
 module.exports = router;

@@ -34,35 +34,16 @@ $(document).ready(function () {
         puzzleNumber;
       document.getElementById("hintNumber").value = hintNumber;
       document.getElementById("hintNumber").dispatchEvent(new Event("change"));
-      //console.log("changing hint");
-
       let tempDivData = document.getElementById("gameDataDiv").innerText;
-
       tempDivData = "[" + tempDivData + "]";
-      console.log("tempDivData: " + tempDivData);
       let gameHintArray = JSON.parse(tempDivData);
-      // console.log(
-      //   "gameHintArray: " + gameHintArray,
-      //   " length: ",
-      //   gameHintArray.length
-      // );
-      // console.log(
-      //   "gameHintArray: " + gameHintArray[0],
-      //   " length: ",
-      //   gameHintArray[0].length
-      // );
 
       let payload = [];
       let pusher = [];
       for (let i = 0; i < gameHintArray.length; i++) {
         let tempArr = [];
-        // tempArr.push(gameNames[i]);
-        // tempArr.push(gameHintArray[i]);
-        // let stringer = gameHintArray[i].toString();
         let stringer = gameHintArray[i];
 
-        // pusher.push(stringer);
-        // if not last element
         if (i != gameHintArray.length - 1) {
           pusher += gameNames[i] + ";;" + JSON.stringify(stringer) + "&&";
         } else {
@@ -70,18 +51,16 @@ $(document).ready(function () {
         }
       }
       payload.push(pusher);
-      // console.log("payload: " + payload);
-      // payload = payload.toString();
-      //post to server
+
       $.ajax({
         url: "/admin/saveHintArray",
         type: "POST",
         data: { gameHintArray: payload },
         success: function (data) {
           console.log("data: " + data);
-          document.getElementById("saveHintArray").text = "Saved";
+          document.getElementById("saveHintArray").innerHTML = "Saved!";
           setTimeout(function () {
-            document.getElementById("saveHintArray").text = "Save Hints";
+            document.getElementById("saveHintArray").value = "Save Hints";
           }, 5000);
         },
       });
@@ -343,6 +322,24 @@ $(document).ready(function () {
       document.getElementById("gameNumber").value = gameNumber;
       document.getElementById("gameNumber").dispatchEvent(new Event("change"));
     });
+
+  document.getElementById("changeName").addEventListener("click", function () {
+    // show adminModal jquery
+    $("#adminModal").modal("show");
+  });
+
+  document.getElementById("okNewName").addEventListener("click", function () {
+    document.getElementById("gameNumber").options[
+      document.getElementById("gameNumber").selectedIndex
+    ].text = document.getElementById("newGameName").value;
+
+    $("#adminModal").modal("hide");
+
+    gameNames[document.getElementById("gameNumber").value - 1] =
+      document.getElementById("gameNumber").options[
+        document.getElementById("gameNumber").selectedIndex
+      ].text;
+  });
 
   // document.getElementById("changeHint").addEventListener("click", function () {
   //   let gameNumber = document.getElementById("gameNumber").value;
