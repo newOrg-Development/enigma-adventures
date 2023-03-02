@@ -54,6 +54,7 @@ const gamesViewerHead = module.require("./views/custom/gamesViewerHead.hbs");
 
 const emailRouter = require("./routes/email");
 const homeRouter = require("./routes/homeRouter");
+const adminRouter = require("./routes/adminRouter");
 
 app.use("/email", emailRouter);
 app.use("/", homeRouter);
@@ -245,8 +246,13 @@ app.post("/download", (req, res) => {
 });
 
 app.get("/admin", (req, res) => {
-  res.render("admin", { customHead: adminHead, gameData: gameread });
+  googleController.getGameHints().then((gameHintsArr) => {
+    // gameHintsArr = gameHintsArr.split("&&");
+    res.render("admin", { customHead: adminHead, gameData: gameHintsArr });
+  });
 });
+
+app.use("/admin", adminRouter);
 
 if (process.env.NODE_ENV === "development") {
   console.log("development mode");

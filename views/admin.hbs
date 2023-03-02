@@ -1,52 +1,78 @@
 <form>
-  <div class="mb-3 mt-5">
+    <div class="mb-3 mt-5">
+    <label for="gameNumber" class="form-label">States</label>
+  <select class="form-select" aria-label="Default select example" id="states">
+</select>
+  </div>
+  <div class="mb-3">
     <label for="gameNumber" class="form-label">Game</label>
   <select class="form-select" aria-label="Default select example" id="gameNumber">
-  
- 
 </select>
+
+<div class="gap-2 mt-2">
+    <button class="btn btn-lg btn-primary" type="button" id="addGame"><span class="material-symbols-outlined">
+add
+</span></button>
+
+    <button class="btn btn-lg btn-primary" type="button" id="removeGame"><span class="material-symbols-outlined">
+remove
+</span></button>
+  </div>
+  </div>
   <div class="mb-3">
     <label for="puzzleNumber" class="form-label">Puzzle Number</label>
    <select class="form-select" aria-label="Default select example" id="puzzleNumber">
   
  
 </select>
-  <div class="mb-3">
+  
+ <div class="gap-2 mt-2">
+    <button class="btn btn-lg btn-primary" type="button" id="addPuzzle"><span class="material-symbols-outlined">
+add
+</span></button>
+    <button class="btn btn-lg btn-primary" type="button" id="removePuzzle"><span class="material-symbols-outlined">
+remove
+</span></button>
+</div>
+</div>
+ <div class="mb-3">
     <label for="hintNumber" class="form-label">Hint Number</label>
     <select class="form-select" aria-label="Default select example" id="hintNumber">
-  
 </select>
+  <div class="gap-2 mt-2">
+    <button class="btn btn-lg btn-primary" type="button" id="addHint"><span class="material-symbols-outlined">
+add
+</span></button>
+
+    <button class="btn btn-lg btn-primary" type="button" id="removeHint"><span class="material-symbols-outlined">
+remove
+</span></button>
   </div>
-  <div class="mb-3">
+
+  </div>
+  <hr>
+  <div class="mb-3 mt-3">
     <label for="hint" class="form-label">Hint</label>
     <textarea type="text" class="form-control" id="hint" /></textarea>
   </div>
- <div class="d-grid gap-2 mt-2">
-    <button class="btn btn-primary" type="button" id="addGame">Add Game</button>
+    <div class="mb-3">
+    <label for="hint" class="form-label">QRString</label>
+    <input type="text" class="form-control" id="qrString" />
   </div>
 
-  <div class="d-grid gap-2 mt-2">
-    <button class="btn btn-primary" type="button" id="removeGame">Remove Game</button>
-  </div>
-    <div class="d-grid gap-2 mt-2">
-    <button class="btn btn-primary" type="button" id="addPuzzle">Add Puzzle</button>
-  </div>
+ 
+   
+{{!-- 
+   <div class="d-grid gap-2 mt-2">
+    <button class="btn btn-primary" type="button" id="changeHint">Change Hint/QR</button>
+  </div> --}}
 
-  <div class="d-grid gap-2 mt-2">
-    <button class="btn btn-primary" type="button" id="removePuzzle">Remove Puzzle</button>
-  </div>
-  <div class="d-grid gap-2 mt-2">
-    <button class="btn btn-primary" type="button" id="changeHint">Change Hint</button>
-  </div>
 
-  <div class="d-grid gap-2 mt-2">
-    <button class="btn btn-primary" type="button" id="addHint">Add Hint</button>
-  </div>
-
-  <div class="d-grid gap-2 mt-2">
-    <button class="btn btn-primary" type="button" id="removeHint">Remove Hint</button>
+   <div class="d-grid gap-2 mt-2">
+    <button class="btn btn-primary" type="button" id="saveHintArray">Save Hints</button>
   </div>
 
 </form>
 
-<div  id="gameDataDiv">{{{gameData}}}</div>
+<div  id="gameDataDiv" style="display:none">{{{gameData}}}</div>
+

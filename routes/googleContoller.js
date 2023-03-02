@@ -207,10 +207,89 @@ async function updateGameStates(input) {
   return;
 }
 
+async function saveGameHints(input) {
+  //[[["g1p1h1","g1p1h2"],["g1p2h1","g1p2h2"]],[["g2p1h1","g2p1h2"],["g2p2h1","g2p2h2"]],[["g3p1h1","g3p1h2"],["g3p2h1","g3p2h2"]]]
+  const auth = new docs.auth.GoogleAuth({
+    //keyFilename: "credentials.json",
+    keyFile: googleCreds,
+    scopes: ["https://www.googleapis.com/auth/documents"],
+  });
+  const authClient = await auth.getClient();
+
+  const client = await docs.docs({
+    version: "v1",
+    auth: authClient,
+  });
+
+  const createResponse = await client.documents.get({
+    documentId: "16yQLAT8GvyDRXH0al1IGCuoxN7cxqGaSLVvUhEr-8wM",
+  });
+
+  let endIndex = createResponse.data.body.content[1].endIndex;
+
+  const updateResponse = await client.documents.batchUpdate({
+    documentId: "16yQLAT8GvyDRXH0al1IGCuoxN7cxqGaSLVvUhEr-8wM",
+    requestBody: {
+      requests: [
+        // {
+        //   deleteContentRange: {
+        //     range: {
+        //       segmentId: "",
+        //       startIndex: 1,
+        //       endIndex: endIndex,
+        //     },
+        //   },
+        // },
+        {
+          insertText: {
+            text: input + "@@",
+            // endOfSegmentLocation: {},
+            location: {
+              index: 1,
+            },
+          },
+        },
+      ],
+    },
+  });
+
+  return;
+}
+
+async function getGameHints() {
+  //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
+  const auth = new docs.auth.GoogleAuth({
+    //keyFilename: "credentials.json",
+    keyFile: googleCreds,
+    scopes: ["https://www.googleapis.com/auth/documents"],
+  });
+  const authClient = await auth.getClient();
+
+  const client = await docs.docs({
+    version: "v1",
+    auth: authClient,
+  });
+
+  const createResponse = await client.documents.get({
+    documentId: "16yQLAT8GvyDRXH0al1IGCuoxN7cxqGaSLVvUhEr-8wM",
+  });
+
+  console.log("here here here ", createResponse.data.body.content[1]);
+  let fullText = "";
+  createResponse.data.body.content[1].paragraph.elements.forEach((element) => {
+    console.log("element ", element.textRun.content);
+    fullText += element.textRun.content;
+  });
+  //let splitText = fullText.split("@@");
+  return fullText;
+}
+
 module.exports = {
   docer,
   getLeaderboard,
   updateLeaderboard,
   getGameStates,
   updateGameStates,
+  saveGameHints,
+  getGameHints,
 };

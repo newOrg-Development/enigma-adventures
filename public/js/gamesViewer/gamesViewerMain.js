@@ -1,6 +1,4 @@
 $(document).ready(function () {
-  console.log("here here here ");
-
   let gamesHeaders = [
     "", //blank 0,0 table cell
     "gameId",
