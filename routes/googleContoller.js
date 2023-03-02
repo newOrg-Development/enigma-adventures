@@ -69,7 +69,6 @@ async function getLeaderboard() {
     documentId: "1HNawNy2v4WrrOyVCSNH6MIjyzDBClPPaSgf-6mZZ-nw",
   });
 
-  console.log("here here here ", createResponse.data.body.content[1]);
   let fullText = "";
   createResponse.data.body.content[1].paragraph.elements.forEach((element) => {
     fullText += element.textRun.content;
@@ -147,7 +146,6 @@ async function getGameStates() {
     documentId: "1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk",
   });
 
-  console.log("here here here ", createResponse.data.body.content[1]);
   let fullText = "";
   createResponse.data.body.content[1].paragraph.elements.forEach((element) => {
     fullText += element.textRun.content;
@@ -274,13 +272,10 @@ async function getGameHints() {
     documentId: "16yQLAT8GvyDRXH0al1IGCuoxN7cxqGaSLVvUhEr-8wM",
   });
 
-  console.log("here here here ", createResponse.data.body.content[1]);
   let fullText = "";
   createResponse.data.body.content[1].paragraph.elements.forEach((element) => {
-    console.log("element ", element.textRun.content);
     fullText += element.textRun.content;
   });
-  //let splitText = fullText.split("@@");
   return fullText;
 }
 

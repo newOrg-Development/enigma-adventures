@@ -27,6 +27,18 @@ $(document).ready(function () {
     }
   });
 
+  document.getElementById("qrCodeData").addEventListener("change", function () {
+    if (
+      document.getElementById("qrCodeData").options[
+        document.getElementById("qrCodeData").selectedIndex
+      ].text == "hint"
+    ) {
+      document.getElementById("hintHidder").style.display = "block";
+    } else {
+      document.getElementById("hintHidder").style.display = "none";
+    }
+  });
+
   if (document.getElementById("sessionData").innerText != "") {
     document.getElementById("logoutDiv").style.display = "block";
   }
@@ -170,6 +182,9 @@ $(document).ready(function () {
       let teamName = session.teamName;
       let cluesUsed = session.cluesUsed;
       let uuid = session.uuid;
+      let gameNum = document.getElementById("gameNumForHint").value;
+      let puzzleId = document.getElementById("puzzleNumForHint").value;
+
       if (!uuid) {
         alert("You must be logged in to do that.");
       } else if (qrCodeData == "hint") {
@@ -178,10 +193,13 @@ $(document).ready(function () {
           url: "/getHint",
           data: {
             uuid,
+            gameNum,
+            puzzleId,
           },
           success: function (msg) {
             if (msg == "false") {
             } else {
+              alert(msg);
             }
           },
         });
