@@ -2,10 +2,6 @@
   font-size: 1em;
 }
 
-label {
-  font-weight: bold;
-}
-
 .checkerBox {
   border: 0.5px solid grey;
 }
