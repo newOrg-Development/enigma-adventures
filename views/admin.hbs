@@ -74,11 +74,24 @@ remove
   <div class="mb-3 mt-3">
     <label for="hint" class="form-label">Hint</label>
     <textarea type="text" class="form-control" id="hint" /></textarea>
+
+  <div class="d-inline-flex mt-2">  
+ <span class="fw-bold">QR String</span>
+  <div class="form-check form-switch form-check-reverse position-absolute" style="right:5%;">
+     <label class="form-check-label" for="flexSwitchCheckReverse">Show QR Scanner</label> 
+      <input class=" btn btn-lg form-check-input checkerBox" type="checkbox" role="switch" id="showScannerSwitch">
   </div>
-    <div class="mb-3">
-    <label for="hint" class="form-label">QRString</label>
-    <input type="text" class="form-control" id="qrString" />
+ 
   </div>
+
+<div class="mx-auto mt-2" style="width: 80%; display:none" id="scanner"></div>
+    {{!-- <label for="hint" class="form-label">QRString</label>  --}}
+    <div class="mt-2">
+<input type="text" class="form-control" id="qrString" />
+    </div>
+
+ </div>
+ 
 
  
    

@@ -15,6 +15,43 @@ $(document).ready(function () {
   ];
 
   // console.log("temp: " + JSON.stringify(temp));
+  //showscannerswitch toggle
+
+  let showScannerSwitch = document.getElementById("showScannerSwitch");
+  showScannerSwitch.addEventListener("change", function () {
+    //console.log("showScannerSwitch: " + showScannerSwitch.checked);
+    if (showScannerSwitch.checked) {
+      document.getElementById("scanner").style.display = "block";
+      html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    } else {
+      document.getElementById("scanner").style.display = "none";
+    }
+  });
+
+  function onScanSuccess(decodedText, decodedResult) {
+    //let select = document.getElementById("qrCodeData");
+    // for (let i = 0; i < select.options.length; i++) {
+    if (decodedText) {
+      alert("decodedText: " + decodedText);
+      document.getElementById("qrString").value = decodedText;
+      document.getElementById("html5-qrcode-button-camera-stop").click();
+      //  break;
+    } else {
+      alert("no text!");
+    }
+    // }
+    return;
+  }
+
+  function onScanFailure(error) {
+    console.log("error: " + error);
+  }
+
+  let html5QrcodeScanner = new Html5QrcodeScanner(
+    "scanner",
+    { fps: 10, qrbox: { width: 250, height: 250 } },
+    /* verbose= */ false
+  );
 
   document
     .getElementById("saveHintArray")
@@ -60,7 +97,7 @@ $(document).ready(function () {
           console.log("data: " + data);
           document.getElementById("saveHintArray").innerHTML = "Saved!";
           setTimeout(function () {
-            document.getElementById("saveHintArray").value = "Save Hints";
+            document.getElementById("saveHintArray").innerHTML = "Save Hints";
           }, 5000);
         },
       });
