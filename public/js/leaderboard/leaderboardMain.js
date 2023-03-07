@@ -3,25 +3,6 @@ $(document).ready(function () {
   let leaderboardData = document.getElementById("leaderboardDiv").innerText;
   document.getElementById("leaderboardTableBody").innerHTML = "";
   leaderboardData = JSON.parse(leaderboardData);
-  let leaderboardRow = "";
-  let leaderboardHeadRow = "";
-  // let tableHeadersArray = ["teamName", "hintsUsed", "finishTime"];
-
-  // tableHeadersArray.forEach((item, index) => {
-  //   leaderboardHeadRow += `<th scope="col">${item}</th>`;
-  // });
-
-  // leaderboardData.forEach((leader, index) => {
-  //   leaderboardRow = "<tr>";
-  //   tableHeadersArray.forEach((leaderField, index2) => {
-  //     leaderboardRow += `<td>${leader[leaderField]}</td>`;
-  //   });
-  //   document.getElementById("leaderboardTableBody").innerHTML +=
-  //     leaderboardRow + "</tr>";
-  // });
-  // document.getElementsByTagName("thead")[0].rows[0].innerHTML =
-  //   leaderboardHeadRow;
-
   let fieldsIn = Object.keys(leaderboardData[0]);
   function displayTable(fields) {
     table.getElementsByTagName("tbody")[0].innerHTML = "";
@@ -50,7 +31,6 @@ $(document).ready(function () {
     newCheck.getElementsByTagName("input")[0].id = item;
     newCheck.getElementsByTagName("label")[0].htmlFor = item;
     newCheck.getElementsByTagName("label")[0].innerText = item;
-    //if not uuid startTime puszzleCount
     if (
       item != "uuid" &&
       item != "teamEmail" &&
@@ -78,6 +58,5 @@ $(document).ready(function () {
       displayTable(fieldsOut);
     });
   }
-  //trigger checkbox check event
   document.getElementsByTagName("input")[1].dispatchEvent(new Event("change"));
 });

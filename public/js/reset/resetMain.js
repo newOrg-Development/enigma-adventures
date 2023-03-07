@@ -1,49 +1,37 @@
 $(document).ready(function () {
+  $("#carouselMain").on("slide.bs.carousel", function (e) {
+    if (e.direction == "right") {
+      document.getElementsByClassName("carousel-control-prev")[1].click();
+    } else {
+      document.getElementsByClassName("carousel-control-next")[1].click();
+    }
+  });
+
   $("#carouselMain").on("slid.bs.carousel", function (e) {
-    let innerCarouselChildren =
-      document.getElementById("innerCarousel").children;
-    let innerClientCarouselChildren = document.getElementById(
-      "innerClientCarousel"
-    ).children;
-    for (let j = 0; j < innerClientCarouselChildren.length; j++) {
-      if (innerClientCarouselChildren[j].classList.contains("active")) {
-        console.log("removing");
-        innerClientCarouselChildren[j].classList.remove("active");
+    let activeImgCounter = 0;
+    let carItems = document
+      .getElementById("innerCarousel")
+      .getElementsByClassName("carousel-item");
+    for (let i = 0; i < carItems.length; i++) {
+      if (carItems[i].classList.contains("active")) {
+        activeImgCounter = carItems[i]
+          .getElementsByTagName("img")[0]
+          .getAttribute("counter");
       }
-    }
-    for (let i = 0; i < innerCarouselChildren.length; i++) {
-      if (innerCarouselChildren[i].classList.contains("active")) {
-        {
-          innerClientCarouselChildren[i].classList.add("active");
-          document.getElementById("mainCarouselTitle").innerText =
-            "Picture To Match Number: " + (i + 1);
-        }
-      }
+      document.getElementById(
+        "mainCarouselTitle"
+      ).innerText = `Picture To Match Number: ${parseInt(activeImgCounter)}`;
     }
   });
 
-  $("#clientCarousel").on("slid.bs.carousel", function (e) {
-    let innerCarouselChildren =
-      document.getElementById("innerCarousel").children;
-    let innerClientCarouselChildren = document.getElementById(
-      "innerClientCarousel"
-    ).children;
-
-    for (let j = 0; j < innerCarouselChildren.length; j++) {
-      if (innerCarouselChildren[j].classList.contains("active")) {
-        innerCarouselChildren[j].classList.remove("active");
-      }
-    }
-    for (let i = 0; i < innerClientCarouselChildren.length; i++) {
-      if (innerClientCarouselChildren[i].classList.contains("active")) {
-        {
-          innerCarouselChildren[i].classList.add("active");
-          document.getElementById("mainCarouselTitle").innerText =
-            "Picture To Match Number: " + (i + 1);
-        }
-      }
+  $("#clientCarousel").on("slide.bs.carousel", function (e) {
+    if (e.direction == "right") {
+      document.getElementsByClassName("carousel-control-prev")[0].click();
+    } else {
+      document.getElementsByClassName("carousel-control-next")[0].click();
     }
   });
+
   let resetImgs = document.getElementById("dlUrl").innerText;
   resetImgs = resetImgs.trim();
   resetImgs = resetImgs.split(",");
@@ -53,14 +41,21 @@ $(document).ready(function () {
     let newCarouselItem = carouselItemTemplate.cloneNode(true);
     let newClientCarouselItem = carouselItemTemplate.cloneNode(true);
     newCarouselItem.getElementsByTagName("img")[0].src = img;
+    newCarouselItem.getElementsByTagName("img")[0].alt = "asdf";
+    //add attribute to img
+    newCarouselItem
+      .getElementsByTagName("img")[0]
+      .setAttribute("counter", index + 1);
+    newClientCarouselItem
+      .getElementsByTagName("img")[0]
+      .setAttribute("counter", index + 1);
     newClientCarouselItem.getElementsByTagName("img")[0].src =
       "./images/placeholder.png";
-
+    newClientCarouselItem.getElementsByTagName("img")[0].alt = "asdfasdf";
     if (index == 0) {
       newCarouselItem.classList.add("active");
       newClientCarouselItem.classList.add("active");
     }
-
     document.getElementById("innerCarousel").appendChild(newCarouselItem);
     document
       .getElementById("innerClientCarousel")

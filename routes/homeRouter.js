@@ -5,18 +5,7 @@ const { v4: uuidv4 } = require("uuid");
 const googleController = require("./googleContoller.js");
 const { Game, GameStructure, LeaderboardEntry } = require("../gameClass");
 
-// https://localhost:3000/magicLink?uuid=95b29f81-b57c-4ce0-a72c-4cb2ae9323f0
-//  {"cookie":{"originalMaxAge":86400000,"expires":"2023-02-28T19:29:48.185Z",
-// "httpOnly":true,"path":"/"},"teamName":"joger","teamEmail":"ste.pend@rcom",
-// "timestamp":"1677526206150","cluesUsed":0,"uuid":"95b29f81-b57c-4ce0-a72c-4cb2ae9323f0",
-// "env":"development"}
-// let gameStates = [];
 let currentGames = [];
-// googleController.getGameHints().then((data) => {
-//   gameStates = data.split("@@");
-//   currentGames = gameStates[0].split("&&");
-// });
-
 googleController.getGameHints().then((data) => {
   let parsedData = JSON.parse(data);
   parsedData.forEach((game) => {
@@ -37,12 +26,8 @@ router.get("/clue", (req, res) => {
         version: "v2",
         auth: authClient,
       });
-      //'1E7o8MhhCF9al7htnPtryJvnjbFNBWMnd
       let filesList = await drive.files.list({
-        // fileId: "1E7o8MhhCF9al7htnPtryJvnjbFNBWMnd",
         q: `'${"1quubXDC_7Uktspcp-Cjrja1Iwbj3wcBm"}' in parents`,
-        // alt: "media",
-        // fields: "webContentLink",
       });
       let fileItems = filesList.data.items;
       let webContentLinkArray = [];
@@ -96,7 +81,6 @@ router.post("/gameEnd", (req, res) => {
   let finishedGame = new Game();
   finishedGame.loadGame(uuid).then(() => {
     let claimedFinishTime = req.body.timestamp; //in Case server lags
-
     finishedGame.endGame().then((finishResults) => {
       let leaderBoardCheck = new LeaderboardEntry(finishedGame);
       leaderBoardCheck
@@ -119,7 +103,6 @@ router.post("/signUp", (req, res) => {
       currentGames[parseInt(req.body.gameNumber)].getClueCountArr()
     );
     game.startGame();
-    //res.session.uuid = game.uuid;
     let msg = {};
     msg.uuid = game.uuid;
     msg.env = process.env.NODE_ENV;

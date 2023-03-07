@@ -1,8 +1,6 @@
 const docs = require("@googleapis/docs");
 const { google } = require("googleapis");
 
-//googleCreds
-
 let googleCreds = "";
 if (process.env.NODE_ENV == "development") {
   googleCreds = "./credentials.json";

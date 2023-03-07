@@ -6,7 +6,6 @@ const bodyParser = require("body-parser");
 const fs = require("fs");
 const session = require("express-session");
 require("dotenv").config();
-
 const { google } = require("googleapis");
 const cors = require("cors");
 const axios = require("axios");
@@ -100,7 +99,6 @@ app.get("/gamesViewer", (req, res) => {
 app.get("/magicLink", (req, res) => {
   console.log("magic link");
   let newGame = new Game();
-
   newGame.loadGame(req.query.uuid).then(() => {
     req.session.uuid = req.query.uuid;
     res.render("home", {

@@ -1,20 +1,6 @@
 const { google } = require("googleapis");
 const { v4: uuidv4 } = require("uuid");
 const googleController = require("./routes/Class_googleContoller.js");
-// class MyReadable extends Rectangle {
-//   constructor(options) {
-//     super(options);
-//   }
-
-//   _read() {
-//     this.push("hello world");
-//     this.push(null);
-//   }
-// }
-
-//51c47bfb-360c-4472-85c4-2e511f446947;jonkers;bo@seven.com;0,1,2,1,0,0,3,0;1677744685150
-
-//bfc16610-2e40-45a1-ae4f-91a9e219448e;chckers;too@dot.com;;1677833054549&&51c47bfb-360c-4472-85c4-2e511f446947;jonkers;bo@seven.com;0,1,2,1,0,0,3,0;1677744685150&&101c9133-8d4e-4032-b645-7c6375bcf618;Craigerrrr;tcraigscott@gmail.com;[];01677625887893&&e1fb5c0c-3336-4230-9d6b-3a957a161182;3teamName3;email3@address3.com;[];01677609645846&&9ad96a64-e06b-4f81-ae91-6960cc116e58;2teamName2;email2@address2.com;[];1677609631415&&479e4bc6-a8ef-426b-9975-58a0c1d9b00f;teamName;email@address.com;[];1677609613664
 
 class Game {
   constructor(_teamName, _teamEmail, _puzzleCount) {
@@ -116,12 +102,6 @@ class LeaderboardEntry extends Game {
   }
 }
 
-let leaderboard = new LeaderboardEntry(
-  JSON.parse(
-    '{"uuid":"56b4fba5-ed94-463c-9b84-becf8e56f045","teamName":"jonkers","teamEmail":"tel@email.com","startTime":1677839445822,"finishTime":1677884416947,"hintsAvailable":[6,7,7,7,7,7,7]}'
-  )
-);
-
 class GameStructure {
   constructor(_game, _gameName) {
     if (_game === "newGame") {
@@ -212,7 +192,6 @@ class GameStructure {
     let newOjb = { gameName: this.gameName, puzzleArray: this.hintTree };
     googleController.getGameHints().then((gameHintsData) => {
       gameHintsData = JSON.parse(gameHintsData);
-      //search data arr for game name
       let breaker = false;
       gameHintsData.forEach((game, index) => {
         if (game.gameName === this.gameName && breaker === false) {
