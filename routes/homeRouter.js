@@ -83,17 +83,13 @@ router.post("/gameEnd", (req, res) => {
     let claimedFinishTime = req.body.timestamp; //in Case server lags
     finishedGame.endGame().then((finishResults) => {
       let leaderBoardCheck = new LeaderboardEntry(finishedGame);
-      leaderBoardCheck
-        .checkForLeader(finishResults)
-        .then((leaderboardResults) => {
-          console.log("leaderboardResults " + leaderboardResults);
-          res.send(finishResults);
-        });
+      leaderBoardCheck.checkForLeader(finishResults).then(() => {
+        res.send(finishResults);
+      });
     });
   });
 });
 router.post("/signUp", (req, res) => {
-  console.log("signUp " + JSON.stringify(req.body));
   currentGames[parseInt(req.body.gameNumber)].printTree();
   if (req.body.teamName && req.body.teamEmail) {
     let game = new Game(

@@ -3,7 +3,13 @@ $(document).ready(function () {
   let leaderboardData = document.getElementById("leaderboardDiv").innerText;
   document.getElementById("leaderboardTableBody").innerHTML = "";
   leaderboardData = JSON.parse(leaderboardData);
+
+  leaderboardData.forEach((game, index) => {
+    let timeTaken = game.finishTime - game.startTime;
+    game.timeTaken = timeTaken;
+  });
   let fieldsIn = Object.keys(leaderboardData[0]);
+
   function displayTable(fields) {
     table.getElementsByTagName("tbody")[0].innerHTML = "";
     let tableRow = "";
@@ -15,14 +21,18 @@ $(document).ready(function () {
     leaderboardData.forEach((game, index) => {
       tableRow = "<tr>";
       fields.forEach((gameField, index2) => {
-        tableRow += `<td>${game[gameField]}</td>`;
+        if (gameField == "timeTaken") {
+          let trying = new Date(game[gameField]).toISOString().slice(11, 19);
+          tableRow += "<td>" + trying + "</td>";
+        } else {
+          tableRow += `<td>${game[gameField]}</td>`;
+        }
       });
       table.getElementsByTagName("tbody")[0].innerHTML += tableRow + "</tr>";
     });
     document.getElementsByTagName("thead")[0].rows[0].innerHTML =
       gameboardHeadRow;
   }
-  displayTable(fieldsIn);
 
   let checkTemplate =
     document.getElementById("checkBoxTemplate").firstElementChild;
