@@ -12,12 +12,7 @@ if (process.env.NODE_ENV == "development") {
 
 async function docer(input) {
   //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
-  const auth = new docs.auth.GoogleAuth({
-    //keyFilename: "credentials.json",
-    keyFile: googleCreds,
-    // Scopes can be specified either as an array or as a single, space-delimited string.
-    scopes: ["https://www.googleapis.com/auth/documents"],
-  });
+
   const authClient = await auth.getClient();
 
   const client = await docs.docs({
@@ -243,8 +238,6 @@ async function saveGame(saveGame) {
   let endIndex = createResponse.data.body.content[1].endIndex;
   let allGames =
     createResponse.data.body.content[1].paragraph.elements[0].textRun.content;
-  // console.log("allGames: ", allGames);
-  // console.log("allGames: ", allGames.length);
   let gamesBool = false;
 
   allGames = JSON.parse(allGames);
