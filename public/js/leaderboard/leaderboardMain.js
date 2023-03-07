@@ -16,7 +16,7 @@ $(document).ready(function () {
       leaderboardRow += `<td>${leader[leaderField]}</td>`;
     });
     document.getElementById("leaderboardTableBody").innerHTML +=
-      "<tr>" + leaderboardRow + "</tr>";
+      leaderboardRow + "</tr>";
   });
   document.getElementsByTagName("thead")[0].rows[0].innerHTML =
     leaderboardHeadRow;

@@ -23,8 +23,7 @@ $(document).ready(function () {
       fields.forEach((gameField, index2) => {
         tableRow += `<td>${game[gameField]}</td>`;
       });
-      table.getElementsByTagName("tbody")[0].innerHTML +=
-        "<tr>" + tableRow + "</tr>";
+      table.getElementsByTagName("tbody")[0].innerHTML += tableRow + "</tr>";
     });
     document.getElementsByTagName("thead")[0].rows[0].innerHTML =
       gameboardHeadRow;
