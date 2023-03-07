@@ -83,107 +83,72 @@ $(document).ready(function () {
     if (qrCodeData == "signUp") {
       let teamName = document.getElementById("teamName").value;
       let teamEmail = document.getElementById("teamEmail").value;
-      // sendEmail = document.getElementById("sendEmail").checked;
-      // console.log("sendEmail: " + sendEmail);
-      // let teamPassword = document.getElementById("teamPassword").value;
-      // let qrCodeData = document.getElementById("qrCodeData").value;
-      // get selected value from qrCodeData select
-      //     let qrCodeData = document.getElementById("qrCodeData").value;
-      // console.log("qrCodeData: " + qrCodeData);
-
-      //get timestamp
-      let timestamp = new Date().getTime();
-      console.log("timestamp: " + timestamp);
-      $.ajax({
-        type: "POST",
-        url: "/signUp",
-        data: {
-          teamName: teamName,
-          teamEmail: teamEmail,
-          timestamp: timestamp,
-          //teamPassword: teamPassword,
-          qrCodeData: "signUp",
-          // username: "user1",
-          //  password: "mypassword",
-        },
-        success: function (msg) {
-          if (msg == "false") {
-          } else {
-            console.log("msg: " + JSON.stringify(msg));
-            document.getElementById("logoutDiv").style.display = "block";
-            document.getElementById("sessionData").innerText =
-              JSON.stringify(msg);
-
-            //make a url out of the msg
-            let sendEmailBool = document.getElementById("sendEmail").checked;
-
-            if (msg.env == "production") {
-              document.getElementById("magicUrl").innerText =
-                "https://enigma-adventures.herokuapp.com/magicLink?uuid=" +
-                msg.uuid;
-              if (sendEmailBool) {
-                sendEmail();
-              }
+      if (teamName && teamEmail) {
+        $.ajax({
+          type: "POST",
+          url: "/signUp",
+          data: {
+            teamName: teamName,
+            teamEmail: teamEmail,
+            gameNumber: 0,
+          },
+          success: function (msg) {
+            if (msg == "failed") {
+              alert("Failed to create session.");
             } else {
-              document.getElementById("magicUrl").innerText =
-                "https://localhost:3000/magicLink?uuid=" + msg.uuid;
-              if (sendEmailBool) {
-                sendEmail();
+              document.getElementById("logoutDiv").style.display = "block";
+              document.getElementById("sessionData").innerText = "";
+              document.getElementById("sessionData").innerText =
+                JSON.stringify(msg);
+              let sendEmailBool = document.getElementById("sendEmail").checked;
+              if (msg.env == "production") {
+                document.getElementById("magicUrl").innerText =
+                  "https://enigma-adventures.herokuapp.com/magicLink?uuid=" +
+                  msg.uuid;
+                if (sendEmailBool) {
+                  sendEmail();
+                }
+              } else {
+                document.getElementById("magicUrl").innerText =
+                  "https://localhost:3000/magicLink?uuid=" + msg.uuid;
+                if (sendEmailBool) {
+                  sendEmail();
+                }
+              }
+              function sendEmail() {
+                let teamName = document.getElementById("teamName").value;
+                let teamEmail = document.getElementById("teamEmail").value;
+                let magicLink = document.getElementById("magicUrl").innerText;
+                $.ajax({
+                  type: "POST",
+                  url: "/email",
+                  data: {
+                    teamName: teamName,
+                    teamEmail: teamEmail,
+                    magicLink: magicLink,
+                  },
+                  success: function (msg) {
+                    if (msg == "false") {
+                    } else {
+                    }
+                  },
+                });
               }
             }
-            // $("#success-saved").removeAttr("hidden");
-            // $("#success-saved").show("fade");
-            // document.getElementById("alert-successsaveClose").onclick =
-            //   function () {
-            //     document
-            //       .getElementById("success-saved")
-            //       .setAttribute("hidden", "true");
-            //   };
-
-            function sendEmail() {
-              let teamName = document.getElementById("teamName").value;
-              let teamEmail = document.getElementById("teamEmail").value;
-              let magicLink = document.getElementById("magicUrl").innerText;
-
-              $.ajax({
-                type: "POST",
-                url: "/email",
-                data: {
-                  teamName: teamName,
-                  teamEmail: teamEmail,
-                  //teamPassword: teamPassword,
-                  magicLink: magicLink,
-                },
-                success: function (msg) {
-                  if (msg == "false") {
-                  } else {
-                    // $("#success-saved").removeAttr("hidden");
-                    // $("#success-saved").show("fade");
-                    // document.getElementById("alert-successsaveClose").onclick =
-                    //   function () {
-                    //     document
-                    //       .getElementById("success-saved")
-                    //       .setAttribute("hidden", "true");
-                    //   };
-                  }
-                },
-              });
-            }
-          }
-        },
-      });
+          },
+        });
+      } else {
+        alert("You must enter a team name and email to continue.");
+      }
     } else {
       let session = document.getElementById("sessionData").innerText;
       if (session != "") {
         session = JSON.parse(session);
       }
 
-      let timestamp = session.timestamp;
-      let teamName = session.teamName;
-      let cluesUsed = session.cluesUsed;
       let uuid = session.uuid;
-      let gameNum = document.getElementById("gameNumForHint").value;
-      let puzzleId = document.getElementById("puzzleNumForHint").value;
+      let gameId = document.getElementById("gameNumForHint").value;
+      let puzzleNum = document.getElementById("puzzleNumForHint").value;
 
       if (!uuid) {
         alert("You must be logged in to do that.");
@@ -193,29 +158,33 @@ $(document).ready(function () {
           url: "/getHint",
           data: {
             uuid,
-            gameNum,
-            puzzleId,
+            puzzleNum,
+            gameId,
           },
           success: function (msg) {
-            if (msg == "false") {
+            if (msg === "false") {
+              alert("No more hints for this puzzle!");
             } else {
-              alert(msg);
+              alert(JSON.stringify(msg));
+              console.log(JSON.stringify(msg));
             }
           },
         });
       } else if (qrCodeData == "gameEnd") {
+        let timestamp = new Date().getTime();
         $.ajax({
           type: "POST",
           url: "/gameEnd",
           data: {
             uuid,
             timestamp,
-            teamName,
-            cluesUsed,
           },
-          success: function (msg) {
-            if (msg == "false") {
+          success: function (data) {
+            console.log("data", data);
+            if (data === "false") {
+              alert("Already Finished");
             } else {
+              alert("Finished game at time:" + data);
             }
           },
         });

@@ -143,7 +143,7 @@ async function getGameStates() {
   });
 
   const createResponse = await client.documents.get({
-    documentId: "1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk",
+    documentId: "1m5BbeqhT7qZoNlzcBUmz-dMQySdsyXF7z7FH-md1b_0",
   });
 
   let fullText = "";
@@ -220,31 +220,31 @@ async function saveGameHints(input) {
   });
 
   const createResponse = await client.documents.get({
-    documentId: "16yQLAT8GvyDRXH0al1IGCuoxN7cxqGaSLVvUhEr-8wM",
+    documentId: "15yEOdkmTlSYGMg_4iOB8k_7ED0o_9gpmtM9Sw8eTqyg",
   });
 
-  let endIndex = createResponse.data.body.content[1].endIndex;
+  let endIndex = createResponse.data.body.content[1].endIndex - 1;
 
   const updateResponse = await client.documents.batchUpdate({
-    documentId: "16yQLAT8GvyDRXH0al1IGCuoxN7cxqGaSLVvUhEr-8wM",
+    documentId: "15yEOdkmTlSYGMg_4iOB8k_7ED0o_9gpmtM9Sw8eTqyg",
     requestBody: {
       requests: [
-        // {
-        //   deleteContentRange: {
-        //     range: {
-        //       segmentId: "",
-        //       startIndex: 1,
-        //       endIndex: endIndex,
-        //     },
-        //   },
-        // },
+        {
+          deleteContentRange: {
+            range: {
+              segmentId: "",
+              startIndex: 1,
+              endIndex: endIndex,
+            },
+          },
+        },
         {
           insertText: {
-            text: input + "@@",
-            // endOfSegmentLocation: {},
-            location: {
-              index: 1,
-            },
+            text: input,
+            endOfSegmentLocation: {},
+            // location: {
+            //   index: 1,
+            // },
           },
         },
       ],
@@ -269,7 +269,7 @@ async function getGameHints() {
   });
 
   const createResponse = await client.documents.get({
-    documentId: "16yQLAT8GvyDRXH0al1IGCuoxN7cxqGaSLVvUhEr-8wM",
+    documentId: "1Le8FKzt_BdJ_OAboPQ7Sqgu8sQ5O8aD4GF9e9el1000",
   });
 
   let fullText = "";

@@ -1,12 +1,23 @@
 $(document).ready(function () {
   let leaderboardData = document.getElementById("leaderboardDiv").innerText;
-  leaderboardData = leaderboardData.split("&&");
+  document.getElementById("leaderboardTableBody").innerHTML = "";
+  leaderboardData = JSON.parse(leaderboardData);
   let leaderboardRow = "";
-  leaderboardData.forEach((element, index) => {
-    let elementArray = element.split(";");
-    leaderboardRow += `<tr><th scope="row">${index + 1}</th><td>${
-      elementArray[0]
-    }</td><td>${elementArray[1]}</td><td>${elementArray[2]}</td></tr>`;
+  let leaderboardHeadRow = "";
+  let tableHeadersArray = ["teamName", "hintsUsed", "finishTime"];
+
+  tableHeadersArray.forEach((item, index) => {
+    leaderboardHeadRow += `<th scope="col">${item}</th>`;
   });
-  document.getElementById("leaderboardTableBody").innerHTML = leaderboardRow;
+
+  leaderboardData.forEach((leader, index) => {
+    leaderboardRow = "<tr>";
+    tableHeadersArray.forEach((leaderField, index2) => {
+      leaderboardRow += `<td>${leader[leaderField]}</td>`;
+    });
+    document.getElementById("leaderboardTableBody").innerHTML +=
+      "<tr>" + leaderboardRow + "</tr>";
+  });
+  document.getElementsByTagName("thead")[0].rows[0].innerHTML =
+    leaderboardHeadRow;
 });

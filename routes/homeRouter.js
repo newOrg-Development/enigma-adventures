@@ -3,17 +3,26 @@ const router = express.Router();
 const { google } = require("googleapis");
 const { v4: uuidv4 } = require("uuid");
 const googleController = require("./googleContoller.js");
+const { Game, GameStructure, LeaderboardEntry } = require("../gameClass");
 
 // https://localhost:3000/magicLink?uuid=95b29f81-b57c-4ce0-a72c-4cb2ae9323f0
 //  {"cookie":{"originalMaxAge":86400000,"expires":"2023-02-28T19:29:48.185Z",
 // "httpOnly":true,"path":"/"},"teamName":"joger","teamEmail":"ste.pend@rcom",
 // "timestamp":"1677526206150","cluesUsed":0,"uuid":"95b29f81-b57c-4ce0-a72c-4cb2ae9323f0",
 // "env":"development"}
-let gameStates = [];
+// let gameStates = [];
 let currentGames = [];
+// googleController.getGameHints().then((data) => {
+//   gameStates = data.split("@@");
+//   currentGames = gameStates[0].split("&&");
+// });
+
 googleController.getGameHints().then((data) => {
-  gameStates = data.split("@@");
-  currentGames = gameStates[0].split("&&");
+  let parsedData = JSON.parse(data);
+  parsedData.forEach((game) => {
+    let gameStructure = new GameStructure(game);
+    currentGames.push(gameStructure);
+  });
 });
 
 router.get("/clue", (req, res) => {
@@ -54,146 +63,69 @@ router.get("/clue", (req, res) => {
 });
 
 router.post("/getHint", (req, res) => {
-  let currentGameArr = currentGames[parseInt(req.body.gameNum)];
-  let currentGame = JSON.parse(currentGameArr.split(";;")[1]);
-  let puzzleId = parseInt(req.body.puzzleId);
   let uuid = req.body.uuid;
+  let gameId = parseInt(req.body.gameId);
+  let puzzleNum = parseInt(req.body.puzzleNum);
+  let game = new Game();
+  game.loadGame(uuid).then((data) => {
+    game.getHintNumber(puzzleNum).then((hintNum) => {
+      if (hintNum === "false") {
+        res.send("false");
+      } else {
+        googleController.getGameHints().then((data) => {
+          let parsedData = JSON.parse(data);
+          let gameStructure = new GameStructure(parsedData[gameId]);
+          let clueCount = gameStructure.getClueCountArr();
 
-  console.log(
-    "currentGame: ",
-    currentGame + " puzzleId: " + puzzleId + " uuid: " + uuid
-  );
-  let gameHintsUsed = "";
-  if (uuid) {
-    googleController.getGameStates().then((data) => {
-      let newGameStates = [];
-      newGameStates = data.split("&&");
-
-      data.split("&&").forEach((gameState, index) => {
-        if (gameState.includes(uuid)) {
-          let gameStateParams = gameState.split(";");
-          let newGameStateParams = "";
-          gameStateParams.forEach((param, index2) => {
-            if (index2 != 3) {
-              if (gameStateParams.length - 1 == index2) {
-                newGameStateParams += param;
-              } else {
-                newGameStateParams += param + ";";
-              }
-              newGameStates[index] = newGameStateParams;
-            } else {
-              let newParam = [];
-              console.log("param: ", param);
-              param = param.split(",");
-              if (param.length == 1) {
-                for (let i = 0; i < currentGame.length; i++) {
-                  console.log("i: ", i);
-                  newParam.push(0);
-                }
-                newParam[puzzleId] = 1;
-              } else {
-                param[puzzleId] = parseInt(param[puzzleId]) + 1;
-                newParam = param;
-              }
-
-              gameHintsUsed = newParam;
-              console.log("gameHintsUsed/param: ", gameHintsUsed);
-              newGameStateParams += newParam + ";";
-              newGameStates[index] = newGameStateParams;
-              googleController.updateGameStates(newGameStates);
-            }
-          });
-          async function getGameHint(puzzleNum, gameHintNum, game) {
-            console.log(
-              "puzzleNum: ",
-              puzzleNum + " gameHintNum: " + gameHintNum + " game: " + game
-            );
-            // let tempGamer = game.split(";;");
-            // console.log("tempGamer ", tempGamer);
-            let puzzleArr = game;
-            if (gameHintNum > puzzleArr[puzzleNum].length) {
-              return "No more hints available";
-            } else {
-              let hint = puzzleArr[puzzleNum][gameHintNum - 1];
-              console.log("hint: ", hint);
-              let hintSplit = hint.split(",");
-              return hintSplit[0];
-            }
-          }
-          console.log("gameHintsUsed: ", gameHintsUsed);
-
-          getGameHint(puzzleId, gameHintsUsed[puzzleId], currentGame).then(
-            (data) => {
-              //console.log(currentGames);
-              res.send(data);
-            }
+          let hint = gameStructure.getHint(puzzleNum - 1, hintNum - 1);
+          console.log(
+            "gameStructure " + JSON.stringify(gameStructure),
+            "hintNum " + hintNum,
+            "puzzleNum " + puzzleNum,
+            "gameId " + gameId
           );
-        }
-      });
-    });
-  }
-});
-
-router.post("/gameEnd", (req, res) => {
-  let uuid = req.body.uuid;
-  let timestamp = req.body.timestamp;
-  let teamName = req.body.teamName;
-  let cluesUsed = req.body.cluesUsed;
-  googleController.getGameStates().then((data) => {
-    let newGameStates = [];
-    let gameStart = timestamp;
-    let gameEnd = Date.now();
-    let gameDuration = gameEnd - gameStart;
-    let seconds = Math.floor(((gameDuration % 360000) % 60000) / 1000); // 1 Second = 1000 Milliseconds
-    newGameStates = data.split("&&");
-    let newLeaderboardEntry = teamName + ";" + cluesUsed + ";" + seconds;
-    googleController.getLeaderboard().then((leaderboardData) => {
-      leaderboardData = leaderboardData.split("&&");
-      let tempLeaderChange = "";
-      let breaker = false;
-      leaderboardData.forEach((leaderboardEntry, index) => {
-        let leaderboardEntryParams = leaderboardEntry.split(";");
-        if (seconds < parseInt(leaderboardEntryParams[2]) && breaker == false) {
-          tempLeaderChange = index;
-        }
-      });
-      leaderboardData.splice(tempLeaderChange, 1);
-      leaderboardData.splice(tempLeaderChange, 0, newLeaderboardEntry);
-      googleController.updateLeaderboard(leaderboardData);
-    });
-
-    data.split("&&").forEach((gameState, index) => {
-      if (gameState.includes(uuid)) {
-        newGameStates[index] = "";
-        googleController.updateGameStates(newGameStates);
+          res.send(hint);
+        });
       }
     });
   });
 });
 
+router.post("/gameEnd", (req, res) => {
+  let uuid = req.body.uuid;
+  let finishedGame = new Game();
+  finishedGame.loadGame(uuid).then(() => {
+    let claimedFinishTime = req.body.timestamp; //in Case server lags
+
+    finishedGame.endGame().then((finishResults) => {
+      let leaderBoardCheck = new LeaderboardEntry(finishedGame);
+      leaderBoardCheck
+        .checkForLeader(finishResults)
+        .then((leaderboardResults) => {
+          console.log("leaderboardResults " + leaderboardResults);
+          res.send(finishResults);
+        });
+    });
+  });
+});
 router.post("/signUp", (req, res) => {
+  console.log("signUp " + JSON.stringify(req.body));
+  currentGames[parseInt(req.body.gameNumber)].printTree();
   if (req.body.teamName && req.body.teamEmail) {
-    req.session.teamName = req.body.teamName;
-    req.session.teamEmail = req.body.teamEmail;
-    req.session.timestamp = req.body.timestamp;
-    req.session.cluesUsed = [];
-    let uuid = uuidv4();
-    req.session.uuid = uuid;
-    req.session.env = process.env.NODE_ENV;
-    googleController.docer(
-      uuid +
-        ";" +
-        req.body.teamName +
-        ";" +
-        req.body.teamEmail +
-        ";" +
-        req.session.cluesUsed +
-        ";" +
-        req.body.timestamp
+    let game = new Game(
+      req.body.teamName,
+      req.body.teamEmail,
+
+      currentGames[parseInt(req.body.gameNumber)].getClueCountArr()
     );
-    res.send(req.session);
+    game.startGame();
+    //res.session.uuid = game.uuid;
+    let msg = {};
+    msg.uuid = game.uuid;
+    msg.env = process.env.NODE_ENV;
+    res.send(msg);
   } else {
-    res.send("Invalid Email or Team Name");
+    res.send("failed");
   }
 });
 

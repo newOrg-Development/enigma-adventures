@@ -12,6 +12,7 @@ const cors = require("cors");
 const axios = require("axios");
 const { Readable } = require("stream");
 const googleController = require("./routes/googleContoller.js");
+const { Game } = require("./gameClass.js");
 
 const oneDay = 1000 * 60 * 60 * 24;
 
@@ -55,11 +56,10 @@ const gamesViewerHead = module.require("./views/custom/gamesViewerHead.hbs");
 const emailRouter = require("./routes/email");
 const homeRouter = require("./routes/homeRouter");
 const adminRouter = require("./routes/adminRouter");
+require("./gameClass");
 
 app.use("/email", emailRouter);
 app.use("/", homeRouter);
-
-let gameread = fs.readFileSync("./gameData/gameData.txt");
 
 app.get("/", isAuthenticated, (req, res) => {
   res.render("home", {
@@ -98,21 +98,14 @@ app.get("/gamesViewer", (req, res) => {
 });
 
 app.get("/magicLink", (req, res) => {
-  googleController.getGameStates().then((data) => {
-    data.split("&&").forEach((gameState) => {
-      if (gameState.includes(req.query.uuid)) {
-        let gameStateParams = gameState.split(";");
-        req.session.uuid = gameStateParams[0];
-        req.session.teamName = gameStateParams[1];
-        req.session.teamEmail = gameStateParams[2];
-        req.session.cluesUsed = gameStateParams[3];
-        req.session.timestamp = gameStateParams[4];
+  console.log("magic link");
+  let newGame = new Game();
 
-        res.render("home", {
-          customHead: mainHead,
-          sessionData: JSON.stringify(req.session),
-        });
-      }
+  newGame.loadGame(req.query.uuid).then(() => {
+    req.session.uuid = req.query.uuid;
+    res.render("home", {
+      customHead: mainHead,
+      sessionData: JSON.stringify(req.session),
     });
   });
 });
@@ -124,7 +117,6 @@ app.get("/logout", (req, res) => {
 
 app.get("/reset", (req, res) => {
   async function driver() {
-    //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
     const auth = new google.auth.GoogleAuth({
       keyFile: googleCreds,
       scopes: ["https://www.googleapis.com/auth/drive.readonly"],
@@ -136,10 +128,7 @@ app.get("/reset", (req, res) => {
     });
 
     let filesList = await drive.files.list({
-      // fileId: "1cJZYX4DXZkQN3O55r53WtA4kZzavJ6rf",
       q: `'${"1mOyL_hVrm5YQSQ3wP2iWXfbkZwnuO91s"}' in parents`,
-      // alt: "media",
-      //fields: "id,name, webContentLink",
     });
     let fileItems = filesList.data.items;
     let filesGet = await drive.files.get({
@@ -170,11 +159,6 @@ app.get("/reset", (req, res) => {
 
       let dataArray = [];
       filesList.data.items.forEach((fileItem) => {
-        //console.log("dl ", i, " ", fileItem);
-        // picturesUrl.push(
-        //   "https://docs.google.com/uc?id=" + fileItem.id + "&export=download"
-        // );
-
         async function syncer(fileId) {
           let image = await axios.get(
             "https://docs.google.com/uc?id=" + fileId + "&export=download",
@@ -205,9 +189,8 @@ app.get("/reset", (req, res) => {
 app.post("/download", (req, res) => {
   let base64Data = req.body.url.split(",")[1];
   let buff = Buffer.from(base64Data, "base64");
-  //
+
   async function customerImgsToDrive(buffer, number) {
-    //https://docs.google.com/document/d/1oCS5mNAmeq8Xpp6mEXvg5K1kP_i9Ey3zr8x6XvXKRpk/edit?usp=sharing
     const auth = new google.auth.GoogleAuth({
       keyFile: googleCreds,
       scopes: ["https://www.googleapis.com/auth/drive"],
@@ -217,16 +200,12 @@ app.post("/download", (req, res) => {
       version: "v3",
       auth: authClient,
     });
-    //1ToI5wBPtxi9e0mvoIKzF8u_hB2aFEiGF
     const fileMetadata = {
       name: "clientPhoto" + number + ".png",
-      //q: `'${"1ToI5wBPtxi9e0mvoIKzF8u_hB2aFEiGF"}' in parents`,
       parents: ["1ToI5wBPtxi9e0mvoIKzF8u_hB2aFEiGF"],
     };
     const media = {
       mimeType: "image/png",
-      //body: fs.createReadStream("./resources/newfile.png"),
-      //https://stackoverflow.com/questions/13230487/converting-a-buffer-into-a-readablestream-in-node-js
       body: Readable.from(buffer),
     };
     try {
@@ -247,7 +226,6 @@ app.post("/download", (req, res) => {
 
 app.get("/admin", (req, res) => {
   googleController.getGameHints().then((gameHintsArr) => {
-    // gameHintsArr = gameHintsArr.split("&&");
     res.render("admin", { customHead: adminHead, gameData: gameHintsArr });
   });
 });
