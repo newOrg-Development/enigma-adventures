@@ -94,7 +94,6 @@ class LeaderboardEntry extends Game {
 
   async checkForLeader(_finishTime) {
     this.finishTime = _finishTime;
-    console.log("this.finishTime", this.finishTime);
     let leaderboard = await googleController.getLeaderboard();
     let leaderMaker = false;
     let leadBreaker = false;
@@ -109,7 +108,6 @@ class LeaderboardEntry extends Game {
         leaderMaker = true;
       }
     });
-
     return leaderMaker;
   }
 
