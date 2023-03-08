@@ -5,6 +5,13 @@ const { v4: uuidv4 } = require("uuid");
 const googleController = require("./googleContoller.js");
 const { Game, GameStructure, LeaderboardEntry } = require("../gameClass");
 
+let googleCreds = "";
+if (process.env.NODE_ENV == "development") {
+  googleCreds = "./credentials.json";
+} else {
+  googleCreds = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+}
+
 let currentGames = [];
 googleController.getGameHints().then((data) => {
   let parsedData = JSON.parse(data);
@@ -15,10 +22,12 @@ googleController.getGameHints().then((data) => {
 });
 
 router.get("/clue", (req, res) => {
-  if (req.body.uuid) {
+  console.log("clue", req.query.uuid);
+  if (req.query.uuid) {
     async function getClues() {
       const auth = new google.auth.GoogleAuth({
-        keyFilename: "driveCreds.json",
+        // keyFilename: "driveCreds.json",
+        keyFile: googleCreds,
         scopes: ["https://www.googleapis.com/auth/drive.readonly"],
       });
       const authClient = await auth.getClient();

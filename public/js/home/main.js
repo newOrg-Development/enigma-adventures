@@ -189,6 +189,7 @@ $(document).ready(function () {
           },
         });
       } else if (qrCodeData == "clue") {
+        console.log("clue", uuid);
         $.ajax({
           type: "GET",
           url: "/clue",
