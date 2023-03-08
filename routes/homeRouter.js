@@ -15,7 +15,7 @@ googleController.getGameHints().then((data) => {
 });
 
 router.get("/clue", (req, res) => {
-  if (req.session.uuid) {
+  if (req.body.uuid) {
     async function getClues() {
       const auth = new google.auth.GoogleAuth({
         keyFilename: "driveCreds.json",
