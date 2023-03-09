@@ -37,7 +37,7 @@ router.post("/signUp", (req, res) => {
   }
 });
 
-router.get("/clue", (req, res) => {
+router.get("/clue", auth, (req, res) => {
   if (req.session.uuid) {
     async function getClues() {
       const auth = new google.auth.GoogleAuth({
@@ -71,8 +71,9 @@ router.get("/clue", (req, res) => {
   }
 });
 
-router.post("/getHint", (req, res) => {
-  let uuid = req.body.uuid;
+router.post("/getHint", auth, (req, res) => {
+  console.log("getHint");
+  let uuid = req.session.uuid;
   let gameId = parseInt(req.body.gameId);
   let puzzleNum = parseInt(req.body.puzzleNum);
   let game = new Game();
@@ -98,8 +99,8 @@ router.post("/getHint", (req, res) => {
   });
 });
 
-router.post("/gameEnd", (req, res) => {
-  let uuid = req.body.uuid;
+router.post("/gameEnd", auth, (req, res) => {
+  let uuid = req.session.uuid;
   let finishedGame = new Game();
   finishedGame.loadGame(uuid).then(() => {
     let claimedFinishTime = req.body.timestamp; //in Case server lags
@@ -112,4 +113,9 @@ router.post("/gameEnd", (req, res) => {
   });
 });
 
+function auth(req, res, next) {
+  console.log("isAuth function");
+  if (req.session.uuid) next();
+  else res.send("noAuth");
+}
 module.exports = router;

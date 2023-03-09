@@ -1,20 +1,4 @@
 $(document).ready(function () {
-  // if (document.getElementById("sessionData").innerText != "") {
-  //   let session = document.getElementById("sessionData").innerText;
-
-  //   document.getElementById("logoutDiv").style.display = "block";
-  //   // document.getElementById("sessionData").innerText = session;
-  //   session = JSON.parse(session);
-  //   if (session.env == "production") {
-  //     document.getElementById("magicUrl").innerText =
-  //       "https://enigma-adventures.herokuapp.com/magicLink?uuid=" +
-  //       session.uuid;
-  //   } else {
-  //     let url = "https://localhost:3000/magicLink?uuid=" + session.uuid;
-  //     document.getElementById("magicUrl").innerText = url;
-  //   }
-  // }
-
   document.getElementById("qrCodeData").addEventListener("change", function () {
     if (
       document.getElementById("qrCodeData").options[
@@ -144,29 +128,28 @@ $(document).ready(function () {
         alert("You must enter a team name and email to continue.");
       }
     } else {
-      let session = document.getElementById("sessionData").innerText;
-      if (session != "") {
-        session = JSON.parse(session);
-      }
+      // let session = document.getElementById("sessionData").innerText;
+      // if (session != "") {
+      //   session = JSON.parse(session);
+      // }
 
-      let uuid = session.uuid;
       let gameId = document.getElementById("gameNumForHint").value;
       let puzzleNum = document.getElementById("puzzleNumForHint").value;
 
-      if (!uuid) {
-        alert("You must be logged in to do that.");
-      } else if (qrCodeData == "hint") {
+      if (qrCodeData == "hint") {
         $.ajax({
           type: "POST",
           url: "/getHint",
           data: {
-            uuid,
+            // uuid,
             puzzleNum,
             gameId,
           },
           success: function (msg) {
             if (msg === "false") {
               alert("No more hints for this puzzle!");
+            } else if (msg === "noAuth") {
+              alert("You are not logged in!");
             } else {
               alert(JSON.stringify(msg));
               console.log(JSON.stringify(msg));
@@ -179,12 +162,12 @@ $(document).ready(function () {
           type: "POST",
           url: "/gameEnd",
           data: {
-            uuid,
             timestamp,
           },
           success: function (data) {
-            console.log("data", data);
-            if (data === "false") {
+            if (data === "noAuth") {
+              alert("You are not logged in!");
+            } else if (data === "false") {
               alert("Already Finished");
             } else {
               alert("Finished game at time:" + data);
@@ -192,15 +175,14 @@ $(document).ready(function () {
           },
         });
       } else if (qrCodeData == "clue") {
-        console.log("clue", uuid);
         $.ajax({
           type: "GET",
           url: "/clue",
-          data: {
-            uuid,
-          },
+          data: {},
           success: function (linkPairs) {
-            if (linkPairs == "false") {
+            if (linkPairs === "noAuth") {
+              alert("You are not logged in!");
+            } else if (linkPairs == "false") {
               alert("You aren't signed in!");
             } else {
               linkPairs.forEach((linkPair) => {
