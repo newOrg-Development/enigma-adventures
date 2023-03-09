@@ -4,6 +4,7 @@ const { google } = require("googleapis");
 const { v4: uuidv4 } = require("uuid");
 const googleController = require("./googleContoller.js");
 const { Game, GameStructure, LeaderboardEntry } = require("../gameClass");
+const emailController = require("./emailController");
 
 let googleCreds = "";
 if (process.env.NODE_ENV == "development") {
@@ -22,8 +23,7 @@ googleController.getGameHints().then((data) => {
 });
 
 router.post("/signUp", (req, res) => {
-  console.log("signup");
-  if (req.body.teamName && req.body.teamEmail) {
+  if (req.body.teamName && req.body.email) {
     let game = new Game(
       req.body.teamName,
       req.body.teamEmail,
@@ -31,10 +31,14 @@ router.post("/signUp", (req, res) => {
     );
     game.startGame();
     req.session.uuid = game.uuid;
-    let msg = {};
-    msg.uuid = game.uuid;
-    msg.env = process.env.NODE_ENV;
-    res.send(msg);
+    if (req.body.emailBool === "true") {
+      let msg = {};
+      msg.uuid = game.uuid;
+      msg.env = process.env.NODE_ENV;
+      msg.teamEmail = req.body.email;
+      msg.teamName = req.body.teamName;
+      emailController.sendEmail(msg);
+    }
   } else {
     res.send("failed");
   }

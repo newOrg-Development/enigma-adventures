@@ -54,12 +54,12 @@ const gamesViewerHead = module.require("./views/custom/gamesViewerHead.hbs");
 const navbarLoggedIn = module.require("./views/custom/navbarLoggedIn.hbs");
 const navbarLoggedOut = module.require("./views/custom/navbarLoggedOut.hbs");
 
-const emailRouter = require("./routes/email");
+//const emailRouter = require("./routes/emailController");
 const homeRouter = require("./routes/homeRouter");
 const adminRouter = require("./routes/adminRouter");
 require("./gameClass");
 
-app.use("/email", emailRouter);
+//app.use("/email", emailRouter);
 app.use("/", homeRouter);
 
 app.get("/", (req, res) => {

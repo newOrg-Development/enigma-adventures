@@ -26,120 +26,128 @@
   </div>
 </div>
 
-<form>
+<form
+  id="loginForm"
+  action="/signUp"
+  method="post"
+  class="needs-validation"
+  novalidate
+>
   <div class="mt-5">
 
   </div>
   <div id="signUpHidder" style="display:none">
     <div class="mb-3">
       <label for="teamName" class="form-label">Game Number: </label>
-      <input type="number" class="form-control" id="gameNumber" value="0" />
+      <input
+        name="gameNumber"
+        type="number"
+        class="form-control no-validate"
+        id="gameNumber"
+        value="0"
+      />
     </div>
     <div class="mb-3">
       <label for="teamName" class="form-label">Team Name</label>
-      <input type="text" class="form-control" id="teamName" />
+      <input
+        name="teamName"
+        type="text"
+        class="form-control no-validate"
+        id="teamName"
+        data-lpignore="true"
+        required
+      />
+      <div class="invalid-feedback">
+        Please enter a team name.
+      </div>
     </div>
     <div class="mb-3">
       <label for="teamEmail" class="form-label">Email Address</label>
       <input
+        name="email"
         type="email"
         class="form-control"
         id="teamEmail"
         aria-describedby="emailHelp"
+        data-lpignore="true"
+        required
       />
+      <div class="invalid-feedback">
+        Please enter a valid email.
+      </div>
     </div>
     <div class="form-check mb-4 mt-4" id="sendEmailDiv">
-      <input class="form-check-input" type="checkbox" value="" id="sendEmail" />
-      <label class="form-check-label" for="sendEmail">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        value="false"
+        name="emailBool"
+        id="eBool"
+      />
+      <label class="form-check-label" for="eBool">
         Send Email
       </label>
     </div>
-    <hr />
+
   </div>
   <div id="hintHidder">
     <div class="mb-3">
       <label for="gameNumForHint" class="form-label">Game Number</label>
-      <input type="text" class="form-control" id="gameNumForHint" value="0" />
+      <input
+        type="text"
+        class="form-control no-validate"
+        id="gameNumForHint"
+        value="0"
+      />
     </div>
     <div class="mb-3">
       <label for="puzzleNumForHint" class="form-label">Puzzle Number</label>
       <input
         type="text"
-        class="form-control"
+        class="form-control no-validate"
         id="puzzleNumForHint"
         aria-describedby=""
         value="1"
       />
     </div>
-
-    <hr />
   </div>
-  <div class="mb-3">
-    <label for="qrCodeData" class="form-label">Scanner Data</label>
-    <select
-      class="form-select"
-      aria-label="Default select example"
-      id="qrCodeData"
+  <div class="d-grid mt-4">
+    <button class="btn btn-primary" id="submitData">
+      Submit</button>
+
+    <button
+      class="btn btn-primary"
+      id="signIn"
+      style="display:none"
+      type="submit"
     >
-      <option value="1">hint</option>
-      <option value="2">signUp</option>
-      <option value="3">gameEnd</option>
-      <option value="4">clue</option>
-    </select>
+      Submit</button>
   </div>
 </form>
+<hr />
+<div class="mb-3 mt-4">
+  <label for="qrCodeData" class="form-label">Scanner Data</label>
+  <select
+    class="form-select"
+    aria-label="Default select example"
+    id="qrCodeData"
+  >
+    <option value="1">hint</option>
+    <option value="2">signUp</option>
+    <option value="3">gameEnd</option>
+    <option value="4">clue</option>
+  </select>
+</div>
+
 <div class="d-grid gap-2 mt-2">
   <button class="btn btn-primary" type="button" id="showScanner">Show/Hide
     Scanner</button>
 </div>
 
 <div class="mx-auto mt-2" style="width: 80%; display:none" id="scanner"></div>
-<div class="d-grid gap-2 mt-2">
-  <button class="btn btn-primary" type="button" id="submitData">
-    Submit</button>
-</div>
 
-{{!-- <div id="session">
-  {{{session}}}
-</div> --}}
-
-<div id="magicUrl">
-
-</div>
+<div id="magicUrl"></div>
 
 <div id="sessionData">
   {{{sessionData}}}
 </div>
-
-{{! <div style="display: none; padding: 5px 10px; text-align: center;"><input
-    id="html5-qrcode-input-range-zoom"
-    class="html5-qrcode-element"
-    type="range"
-    min="1"
-    max="5"
-    step="0.1"
-    style="display: inline-block; width: 50%; height: 5px; background: rgb(211, 211, 211); outline: none; opacity: 0.7;"
-  /><span style="margin-right: 10px;">1x zoom</span></div><span
-  style="margin-right: 10px;"
->Select Camera (3)
-  <select
-    id="html5-qrcode-select-camera"
-    class="html5-qrcode-element"
-    disabled=""
-  ><option
-      value="2d1ff996ae2fc92342d86c37874b37c6dace410fdce20a903829b4208921156c"
-    >camera2 1, facing front</option><option
-      value="f7fd5b7e6acbfa467cce58ea987c05602955beb669575cff22e03fc045c06595"
-    >camera2 2, facing back</option><option
-      value="a7e895c4132f343788c06b901096632dc214c9e1e43ffecd6d3112128d6ebe16"
-    >camera2 0, facing back</option></select></span><span><button
-    id="html5-qrcode-button-camera-start"
-    class="html5-qrcode-element"
-    type="button"
-    style="opacity: 1; display: none;"
-  >Start Scanning</button><button
-    id="html5-qrcode-button-camera-stop"
-    class="html5-qrcode-element"
-    type="button"
-    style="display: inline-block;"
-  >Stop Scanning</button></span> }}
