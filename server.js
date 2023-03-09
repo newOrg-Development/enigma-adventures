@@ -51,6 +51,8 @@ const leaderboardHead = module.require("./views/custom/leaderboardHead.hbs");
 const resetHead = module.require("./views/custom/resetHead.hbs");
 const adminHead = module.require("./views/custom/adminHead.hbs");
 const gamesViewerHead = module.require("./views/custom/gamesViewerHead.hbs");
+const navbarLoggedIn = module.require("./views/custom/navbarLoggedIn.hbs");
+const navbarLoggedOut = module.require("./views/custom/navbarLoggedOut.hbs");
 
 const emailRouter = require("./routes/email");
 const homeRouter = require("./routes/homeRouter");
@@ -60,40 +62,72 @@ require("./gameClass");
 app.use("/email", emailRouter);
 app.use("/", homeRouter);
 
-app.get("/", isAuthenticated, (req, res) => {
-  res.render("home", {
-    customHead: mainHead,
-    sessionData: JSON.stringify(req.session),
-  });
-});
-
 app.get("/", (req, res) => {
-  res.render("home", {
-    customHead: mainHead,
-  });
+  if (req.session.uuid) {
+    let magicLink;
+    if (process.env.NODE_ENV == "production") {
+      magicLink =
+        "https://enigma-adventures.herokuapp.com/magicLink?uuid=" +
+        req.session.uuid;
+    } else {
+      magicLink = "https://localhost:3000/magicLink?uuid=" + req.session.uuid;
+    }
+    res.render("home", {
+      customHead: mainHead,
+      navbar: navbarLoggedIn,
+      sessionData: magicLink,
+    });
+  } else {
+    res.render("home", {
+      customHead: mainHead,
+      navbar: navbarLoggedOut,
+    });
+  }
 });
+//app.get("/", isAuthenticated, (req, res) => {
+//});
 
-function isAuthenticated(req, res, next) {
-  if (req.session.uuid) next();
-  else next("route");
-}
+// function isAuthenticated(req, res, next) {
+//   console.log("isAuth function");
+//   if (req.session.uuid) next();
+//   else next("route");
+// }
 
 app.get("/leaderboard", (req, res) => {
   googleController.getLeaderboard().then((data) => {
-    res.render("leaderboard", {
-      customHead: leaderboardHead,
-      leaderboardData: data,
-    });
+    if (req.session.uuid) {
+      res.render("leaderboard", {
+        customHead: leaderboardHead,
+        navbar: navbarLoggedIn,
+        leaderboardData: data,
+      });
+    } else {
+      res.render("leaderboard", {
+        customHead: leaderboardHead,
+        navbar: navbarLoggedOut,
+        leaderboardData: data,
+      });
+    }
   });
 });
-
 app.get("/gamesViewer", (req, res) => {
-  googleController.getGameStates().then((gameStates) => {
-    res.render("gamesViewer", {
-      customHead: gamesViewerHead,
-      gameStates: gameStates,
+  if (req.session.uuid) {
+    googleController.getGameStates().then((gameStates) => {
+      res.render("gamesViewer", {
+        customHead: gamesViewerHead,
+        navbar: navbarLoggedIn,
+        gameStates: gameStates,
+      });
     });
-  });
+  } else {
+    googleController.getGameStates().then((gameStates) => {
+      res.render("gamesViewer", {
+        customHead: gamesViewerHead,
+        navbar: navbarLoggedOut,
+        gameStates: gameStates,
+      });
+    });
+  }
 });
 
 app.get("/magicLink", (req, res) => {
@@ -101,10 +135,7 @@ app.get("/magicLink", (req, res) => {
   let newGame = new Game();
   newGame.loadGame(req.query.uuid).then(() => {
     req.session.uuid = req.query.uuid;
-    res.render("home", {
-      customHead: mainHead,
-      sessionData: JSON.stringify(req.session),
-    });
+    res.redirect("/");
   });
 });
 
@@ -174,12 +205,21 @@ app.get("/reset", (req, res) => {
     }
     let resetImgs = getResetImages();
     let dlUrl = picturesUrl.toString();
-
-    res.render("reset", {
-      customHead: resetHead,
-      resetImgs: resetImgs,
-      dlUrl: dlUrl,
-    });
+    if (req.session.uuid) {
+      res.render("reset", {
+        customHead: resetHead,
+        navbar: navbarLoggedIn,
+        resetImgs: resetImgs,
+        dlUrl: dlUrl,
+      });
+    } else {
+      res.render("reset", {
+        customHead: resetHead,
+        navbar: navbarLoggedOut,
+        resetImgs: resetImgs,
+        dlUrl: dlUrl,
+      });
+    }
   }
   driver();
 });
@@ -224,7 +264,19 @@ app.post("/download", (req, res) => {
 
 app.get("/admin", (req, res) => {
   googleController.getGameHints().then((gameHintsArr) => {
-    res.render("admin", { customHead: adminHead, gameData: gameHintsArr });
+    if (req.session.uuid) {
+      res.render("admin", {
+        customHead: adminHead,
+        navbar: navbarLoggedIn,
+        gameData: gameHintsArr,
+      });
+    } else {
+      res.render("admin", {
+        customHead: adminHead,
+        navbar: navbarLoggedOut,
+        gameData: gameHintsArr,
+      });
+    }
   });
 });
 

@@ -21,9 +21,24 @@ googleController.getGameHints().then((data) => {
   });
 });
 
+router.post("/signUp", (req, res) => {
+  console.log("signup");
+  if (req.body.teamName && req.body.teamEmail) {
+    let game = new Game(
+      req.body.teamName,
+      req.body.teamEmail,
+      currentGames[parseInt(req.body.gameNumber)].getClueCountArr()
+    );
+    game.startGame();
+    req.session.uuid = game.uuid;
+    res.redirect("/");
+  } else {
+    res.send("failed");
+  }
+});
+
 router.get("/clue", (req, res) => {
-  console.log("clue", req.query.uuid);
-  if (req.query.uuid) {
+  if (req.session.uuid) {
     async function getClues() {
       const auth = new google.auth.GoogleAuth({
         // keyFilename: "driveCreds.json",
@@ -69,8 +84,6 @@ router.post("/getHint", (req, res) => {
         googleController.getGameHints().then((data) => {
           let parsedData = JSON.parse(data);
           let gameStructure = new GameStructure(parsedData[gameId]);
-          let clueCount = gameStructure.getClueCountArr();
-
           let hint = gameStructure.getHint(puzzleNum - 1, hintNum - 1);
           console.log(
             "gameStructure " + JSON.stringify(gameStructure),
@@ -97,24 +110,6 @@ router.post("/gameEnd", (req, res) => {
       });
     });
   });
-});
-router.post("/signUp", (req, res) => {
-  currentGames[parseInt(req.body.gameNumber)].printTree();
-  if (req.body.teamName && req.body.teamEmail) {
-    let game = new Game(
-      req.body.teamName,
-      req.body.teamEmail,
-
-      currentGames[parseInt(req.body.gameNumber)].getClueCountArr()
-    );
-    game.startGame();
-    let msg = {};
-    msg.uuid = game.uuid;
-    msg.env = process.env.NODE_ENV;
-    res.send(msg);
-  } else {
-    res.send("failed");
-  }
 });
 
 module.exports = router;

@@ -1,19 +1,19 @@
 $(document).ready(function () {
-  if (document.getElementById("sessionData").innerText != "") {
-    let session = document.getElementById("sessionData").innerText;
+  // if (document.getElementById("sessionData").innerText != "") {
+  //   let session = document.getElementById("sessionData").innerText;
 
-    document.getElementById("logoutDiv").style.display = "block";
-    // document.getElementById("sessionData").innerText = session;
-    session = JSON.parse(session);
-    if (session.env == "production") {
-      document.getElementById("magicUrl").innerText =
-        "https://enigma-adventures.herokuapp.com/magicLink?uuid=" +
-        session.uuid;
-    } else {
-      let url = "https://localhost:3000/magicLink?uuid=" + session.uuid;
-      document.getElementById("magicUrl").innerText = url;
-    }
-  }
+  //   document.getElementById("logoutDiv").style.display = "block";
+  //   // document.getElementById("sessionData").innerText = session;
+  //   session = JSON.parse(session);
+  //   if (session.env == "production") {
+  //     document.getElementById("magicUrl").innerText =
+  //       "https://enigma-adventures.herokuapp.com/magicLink?uuid=" +
+  //       session.uuid;
+  //   } else {
+  //     let url = "https://localhost:3000/magicLink?uuid=" + session.uuid;
+  //     document.getElementById("magicUrl").innerText = url;
+  //   }
+  // }
 
   document.getElementById("qrCodeData").addEventListener("change", function () {
     if (
@@ -83,6 +83,7 @@ $(document).ready(function () {
     if (qrCodeData == "signUp") {
       let teamName = document.getElementById("teamName").value;
       let teamEmail = document.getElementById("teamEmail").value;
+      let gameNumber = document.getElementById("gameNumber").value;
       if (teamName && teamEmail) {
         $.ajax({
           type: "POST",
@@ -90,42 +91,42 @@ $(document).ready(function () {
           data: {
             teamName: teamName,
             teamEmail: teamEmail,
-            gameNumber: 0,
+            gameNumber: gameNumber,
           },
           success: function (msg) {
             if (msg == "failed") {
               alert("Failed to create session.");
             } else {
-              document.getElementById("logoutDiv").style.display = "block";
-              document.getElementById("sessionData").innerText = "";
-              document.getElementById("sessionData").innerText =
-                JSON.stringify(msg);
+              // document.getElementById("sessionData").innerText = "";
+              // document.getElementById("sessionData").innerText =
+              //   JSON.stringify(msg);
               let sendEmailBool = document.getElementById("sendEmail").checked;
               if (msg.env == "production") {
-                document.getElementById("magicUrl").innerText =
+                let magicLink =
                   "https://enigma-adventures.herokuapp.com/magicLink?uuid=" +
                   msg.uuid;
+                // document.getElementById("magicUrl").innerText = magicLink;
                 if (sendEmailBool) {
-                  sendEmail();
+                  sendEmail(magicLink);
                 }
               } else {
-                document.getElementById("magicUrl").innerText =
+                let magicLink =
                   "https://localhost:3000/magicLink?uuid=" + msg.uuid;
+                //  document.getElementById("magicUrl").innerText = magicLink;
                 if (sendEmailBool) {
-                  sendEmail();
+                  sendEmail(magicLink);
                 }
               }
-              function sendEmail() {
+              function sendEmail(link) {
                 let teamName = document.getElementById("teamName").value;
                 let teamEmail = document.getElementById("teamEmail").value;
-                let magicLink = document.getElementById("magicUrl").innerText;
                 $.ajax({
                   type: "POST",
                   url: "/email",
                   data: {
                     teamName: teamName,
                     teamEmail: teamEmail,
-                    magicLink: magicLink,
+                    magicLink: link,
                   },
                   success: function (msg) {
                     if (msg == "false") {
@@ -134,6 +135,8 @@ $(document).ready(function () {
                   },
                 });
               }
+              //redirects
+              window.location.assign("/");
             }
           },
         });
