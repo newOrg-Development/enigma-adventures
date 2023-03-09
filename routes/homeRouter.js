@@ -31,7 +31,10 @@ router.post("/signUp", (req, res) => {
     );
     game.startGame();
     req.session.uuid = game.uuid;
-    res.redirect("/");
+    let msg = {};
+    msg.uuid = game.uuid;
+    msg.env = process.env.NODE_ENV;
+    res.send(msg);
   } else {
     res.send("failed");
   }
@@ -41,7 +44,6 @@ router.get("/clue", auth, (req, res) => {
   if (req.session.uuid) {
     async function getClues() {
       const auth = new google.auth.GoogleAuth({
-        // keyFilename: "driveCreds.json",
         keyFile: googleCreds,
         scopes: ["https://www.googleapis.com/auth/drive.readonly"],
       });

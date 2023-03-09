@@ -23,10 +23,6 @@ $(document).ready(function () {
     }
   });
 
-  if (document.getElementById("sessionData").innerText != "") {
-    document.getElementById("logoutDiv").style.display = "block";
-  }
-
   document.getElementById("showScanner").addEventListener("click", function () {
     let x = document.getElementById("scanner");
     if (x.style.display === "none") {
