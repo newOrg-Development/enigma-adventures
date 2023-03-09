@@ -1,8 +1,4 @@
 $(document).ready(function () {
-  // document.getElementById("eBool").addEventListener("change", function () {
-  //   console.log("eBool", document.getElementById("ebool").checked);
-  // });
-
   document.getElementById("eBool").addEventListener("change", function () {
     this.value = this.checked ? "true" : "false";
     console.log("eBool", document.getElementById("eBool").checked);
@@ -91,104 +87,11 @@ $(document).ready(function () {
   html5QrcodeScanner.render(onScanSuccess, onScanFailure);
   // Fetch all the forms we want to apply custom Bootstrap validation styles to
 
-  $("#loginForm").on("submit", function () {
-    signIn();
-    function signIn() {
-      // console.log("signing in frsit ");
-      // console.log("signing in", document.getElementById("emailBool").value);
-      if (qrCodeData == "signUp") {
-        console.log("teamName: ");
-        let teamName = document.getElementById("teamName").value;
-        let teamEmail = document.getElementById("teamEmail").value;
-        let gameNumber = document.getElementById("gameNumber").value;
-        let emailBool = document.getElementById("emailBool").checked;
-        // let tempBooler = "";
-        // if (emailBool) {
-        //   tempBooler = "true";
-        // } else {
-        //   tempBooler = "false";
-        // }
-        console.log("teamName: ");
-        //     console.log("meailBool: " + tempBooler);
-        if (teamName && teamEmail) {
-          console.log("sending: ");
-          $.ajax({
-            type: "POST",
-            url: "/signUp",
-            data: {
-              teamName: teamName,
-              teamEmail: teamEmail,
-              gameNumber: gameNumber,
-              emailBool: "true",
-            },
-            success: function (msg) {
-              if (msg == "failed") {
-                alert("Failed to create session.");
-              } else {
-                console.log("early");
-                // document.getElementById("sessionData").innerText = "";
-                // document.getElementById("sessionData").innerText =
-                //   JSON.stringify(msg);
-                let sendEmailBool =
-                  document.getElementById("sendEmail").checked;
-                if (msg.env == "production") {
-                  let magicLink =
-                    "https://enigma-adventures.herokuapp.com/magicLink?uuid=" +
-                    msg.uuid;
-                  // document.getElementById("magicUrl").innerText = magicLink;
-                  if (sendEmailBool) {
-                    sendEmail(magicLink);
-                  }
-                } else {
-                  let magicLink =
-                    "https://localhost:3000/magicLink?uuid=" + msg.uuid;
-                  //  document.getElementById("magicUrl").innerText = magicLink;
-                  if (sendEmailBool) {
-                    sendEmail(magicLink);
-                  }
-                }
-                function sendEmail(link) {
-                  let teamName = document.getElementById("teamName").value;
-                  let teamEmail = document.getElementById("teamEmail").value;
-                  $.ajax({
-                    type: "POST",
-                    url: "/email",
-                    data: {
-                      teamName: teamName,
-                      teamEmail: teamEmail,
-                      magicLink: link,
-                    },
-                    success: function (msg) {
-                      if (msg == "false") {
-                      } else {
-                      }
-                    },
-                  });
-                }
-                console.log("late");
-                //redirects
-                // window.location.assign("/");
-                //   return false;
-              }
-            },
-          });
-        } else {
-          alert("You must enter a team name and email to continue.");
-        }
-      }
-    }
-  });
-
   document.getElementById("submitData").addEventListener("click", function () {
     let qrCodeData =
       document.getElementById("qrCodeData").options[
         document.getElementById("qrCodeData").selectedIndex
       ].text;
-
-    // let session = document.getElementById("sessionData").innerText;
-    // if (session != "") {
-    //   session = JSON.parse(session);
-    // }
 
     let gameId = document.getElementById("gameNumForHint").value;
     let puzzleNum = document.getElementById("puzzleNumForHint").value;

@@ -39,6 +39,7 @@ router.post("/signUp", (req, res) => {
       msg.teamName = req.body.teamName;
       emailController.sendEmail(msg);
     }
+    res.redirect("/");
   } else {
     res.send("failed");
   }
@@ -92,12 +93,6 @@ router.post("/getHint", auth, (req, res) => {
           let parsedData = JSON.parse(data);
           let gameStructure = new GameStructure(parsedData[gameId]);
           let hint = gameStructure.getHint(puzzleNum - 1, hintNum - 1);
-          console.log(
-            "gameStructure " + JSON.stringify(gameStructure),
-            "hintNum " + hintNum,
-            "puzzleNum " + puzzleNum,
-            "gameId " + gameId
-          );
           res.send(hint);
         });
       }
@@ -120,7 +115,6 @@ router.post("/gameEnd", auth, (req, res) => {
 });
 
 function auth(req, res, next) {
-  console.log("isAuth function");
   if (req.session.uuid) next();
   else res.send("noAuth");
 }

@@ -1,21 +1,4 @@
-// const express = require("express");
-// const router = express.Router();
-
-/* GET users listing. */
-// router.post("/", function (req, res, next) {
-//   console.log("email route" + req.body.teamName);
-
-//   sendEmail(req.body).catch(console.error);
-// });
-//("use strict");
 const nodemailer = require("nodemailer");
-
-// let emailObj = {
-//   email: "forsy4444@msn.com",
-//   teamName: "teamName",
-//   uuid: "uuid",
-//   env: process.env.NODE_ENV,
-// };
 
 async function sendEmail(userInputs) {
   console.log("userInputs: ", userInputs);
@@ -53,5 +36,3 @@ async function sendEmail(userInputs) {
 }
 
 module.exports = { sendEmail };
-
-//module.exports = router;
