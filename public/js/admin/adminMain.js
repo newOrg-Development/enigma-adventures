@@ -6,7 +6,7 @@ $(document).ready(function () {
     type: "GET",
     url: "admin/getStates",
     success: function (data) {
-      let gameDataArr = JSON.parse(data);
+      let gameDataArr = data;
       gameDataArr.forEach((game) => {
         let gameStructure = new GameStructure(game);
         gameStructureArray.push(gameStructure);
@@ -143,7 +143,7 @@ $(document).ready(function () {
   });
 
   document.getElementById("addGame").addEventListener("click", function () {
-    let gameStructure = new GameStructure("newGame", "");
+    let gameStructure = new GameStructure("newGame", "~new game~");
     gameStructureArray.push(gameStructure);
     populatePage(gameStructureArray);
     document.getElementById("gameNumber").value = gameStructureArray.length - 1;
@@ -196,8 +196,8 @@ $(document).ready(function () {
   document.getElementById("okNewName").addEventListener("click", function () {
     let gameNumber = document.getElementById("gameNumber").value;
     let newName = document.getElementById("newGameName").value;
-    let gameStructure = new GameStructure("newGame", newName);
-
+    let gameStructure = new GameStructure(gameStructureArray[gameNumber]);
+    gameStructure.gameName = newName;
     gameStructureArray.splice(gameNumber, 1, gameStructure);
     selects[0].innerHTML = "";
     gameStructureArray.forEach((gameStructureData, index) => {
@@ -206,7 +206,7 @@ $(document).ready(function () {
       option.value = index;
       document.getElementById("gameNumber").add(option);
     });
-    document.getElementById("gameNumber").value = gameStructureArray.length - 1;
+    document.getElementById("gameNumber").value = gameNumber;
     document.getElementById("gameNumber").dispatchEvent(new Event("change"));
     $("#adminModal").modal("hide");
   });

@@ -1,30 +1,45 @@
+const { v4: uuidv4 } = require("uuid");
+const mongoController = require("../mongoController.js");
+
 class Game {
   constructor(_teamName, _teamEmail, _puzzleCount) {
+    this.uuid = uuidv4();
     this.teamName = _teamName;
     this.teamEmail = _teamEmail;
     this.startTime = new Date().getTime();
     this.finishTime = "initialised";
-    this.hintsUsed = new Array(_puzzleCount).fill(7);
-    this.puzzleCount = new Array(_puzzleCount).fill(7);
+    this.hintsAvailable = _puzzleCount;
+    this.puzzleCount = _puzzleCount;
+    this.hintsUsed = [];
   }
 
   startGame() {
     this.startTime = new Date().getTime();
     this.finishTime = "running";
-    googleController.saveNewGame(this).then(() => {});
+    mongoController.saveGame(this).then(() => {});
+  }
+
+  async loadGame(uuid) {
+    let loadedGame = await mongoController.loadGame(uuid);
+    Object.keys(loadedGame).forEach((item) => {
+      this[item] = loadedGame[item];
+    });
   }
 
   delGame() {
-    googleController.delGame(this.uuid).then(() => {});
+    mongoController.delGame(this.uuid).then(() => {});
   }
 
   async endGame() {
     if (this.finishTime === "running") {
-      console.log("this.finishTime", this.finishTime);
+      this.finishTime = "finished";
       this.finishTime = new Date().getTime();
-      await googleController.saveGame(this).then(() => {});
-      let newLeaderboardEntry = new LeaderboardEntry();
-
+      for (let i = 0; i < this.hintsAvailable.length; i++) {
+        const el = Math.abs(
+          (this.hintsAvailable[i] || 0) - (this.puzzleCount[i] || 0)
+        );
+        this.hintsUsed[i] = el;
+      }
       return this.finishTime.toString();
     } else {
       return "false";
@@ -33,23 +48,16 @@ class Game {
 
   async getHintNumber(puzzleNumber) {
     puzzleNumber = parseInt(puzzleNumber);
-    if (this.hintsUsed[puzzleNumber] <= 0) {
+    if (this.hintsAvailable[puzzleNumber] <= 0) {
       return "false";
     } else {
-      this.hintsUsed[puzzleNumber]--;
-      googleController.saveGame(this).then(() => {});
+      this.hintsAvailable[puzzleNumber]--;
+      mongoController.saveGame(this).then(() => {});
       let hintNumber =
         parseInt(this.puzzleCount[puzzleNumber]) -
-        parseInt(this.hintsUsed[puzzleNumber]);
+        parseInt(this.hintsAvailable[puzzleNumber]);
       return hintNumber;
     }
-  }
-
-  async loadGame(uuid) {
-    let loadedGame = await googleController.loadGame(uuid);
-    Object.keys(loadedGame).forEach((item) => {
-      this[item] = loadedGame[item];
-    });
   }
 
   printGame() {
@@ -60,26 +68,40 @@ class Game {
 class LeaderboardEntry extends Game {
   constructor(_game) {
     super("", "", 0);
-    Object.keys(_game).forEach((item) => {
-      this[item] = _game[item];
-    });
+    if (_game) {
+      Object.keys(_game).forEach((item) => {
+        this[item] = _game[item];
+      });
+    }
   }
 
-  async checkForLeader() {
-    this.finishTime = 2;
-    let leaderboard = await googleController.getLeaderboard();
-
+  async checkForLeader(_finishTime) {
+    this.finishTime = _finishTime;
+    let timeTaken = parseInt(this.finishTime) - parseInt(this.startTime);
+    let leaderboard = await mongoController.loadLeaderBoard();
+    let leaderMaker = false;
     let leadBreaker = false;
     leaderboard.forEach((leader, index) => {
+      let leaderTimeTaken =
+        parseInt(leader.finishTime) - parseInt(leader.startTime);
       if (
-        parseInt(this.finishTime) <= parseInt(leader.finishTime) &&
+        parseInt(timeTaken) <= parseInt(leaderTimeTaken) &&
         leadBreaker === false
       ) {
         leaderboard.splice(index, 0, this);
         leadBreaker = true;
-        googleController.updateLeaderboard(leaderboard).then(() => {});
+        mongoController.saveLeaderBoard(leaderboard).then(() => {});
+        leaderMaker = true;
       }
     });
+    return leaderMaker;
+  }
+
+  async saveLeaderBoard() {
+    await mongoController.saveLeaderBoard(this);
+  }
+  async loadLeaderBoard() {
+    return await mongoController.loadLeaderBoard();
   }
 
   printLeaderboard() {
@@ -87,10 +109,9 @@ class LeaderboardEntry extends Game {
   }
 }
 
-export class GameStructure {
+class GameStructure {
   constructor(_game, _gameName) {
-    if ((_game === "newGame", _gameName)) {
-      console.log("newGame");
+    if (_game === "newGame") {
       this.gameName = _gameName;
       this.hintTree = [[{ hint: "<empty>", qrCode: "<empty>" }]];
     } else {
@@ -161,9 +182,21 @@ export class GameStructure {
     return JSON.stringify(this.hintTree[_puzzleNumber]);
   }
 
+  getClueCountArr() {
+    let clueCount = [];
+    for (let i = 0; i < this.getPuzzleCount(); i++) {
+      clueCount.push(0);
+      for (let j = 0; j < this.getHintCount(i); j++) {
+        clueCount[i] += 1;
+      }
+    }
+
+    return clueCount;
+  }
+
   saveHintTree() {
     let newOjb = { gameName: this.gameName, puzzleArray: this.hintTree };
-    googleController.getGameHints().then((gameHintsData) => {
+    mongoController.getGameHints().then((gameHintsData) => {
       gameHintsData = JSON.parse(gameHintsData);
       let breaker = false;
       gameHintsData.forEach((game, index) => {
@@ -176,7 +209,7 @@ export class GameStructure {
       if (breaker === false) {
         gameHintsData.push(newOjb);
       }
-      googleController
+      mongoController
         .saveGameHints(JSON.stringify(gameHintsData))
         .then((data) => {});
     });
@@ -186,3 +219,5 @@ export class GameStructure {
     console.log("tree", this.hintTree);
   }
 }
+
+module.exports = { Game, LeaderboardEntry, GameStructure };

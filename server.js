@@ -11,7 +11,15 @@ const cors = require("cors");
 const axios = require("axios");
 const { Readable } = require("stream");
 const googleController = require("./routes/googleContoller.js");
-const { Game } = require("./gameClass.js");
+const { Game } = require("./resources/classes/gameClass.js");
+require("./resources/mongoController.js");
+const MongoDBStore = require("connect-mongodb-session")(session);
+const mongoController = require("./resources/mongoController.js");
+
+const store = new MongoDBStore({
+  uri: process.env.MONGO,
+  collection: "sessions",
+});
 
 const oneDay = 1000 * 60 * 60 * 24;
 
@@ -30,6 +38,7 @@ app.use(
     saveUninitialized: true,
     cookie: { maxAge: oneDay },
     resave: false,
+    store: store,
   })
 );
 
@@ -54,12 +63,10 @@ const gamesViewerHead = module.require("./views/custom/gamesViewerHead.hbs");
 const navbarLoggedIn = module.require("./views/custom/navbarLoggedIn.hbs");
 const navbarLoggedOut = module.require("./views/custom/navbarLoggedOut.hbs");
 
-//const emailRouter = require("./routes/emailController");
 const homeRouter = require("./routes/homeRouter");
 const adminRouter = require("./routes/adminRouter");
-require("./gameClass");
+require("./resources/classes/gameClass");
 
-//app.use("/email", emailRouter);
 app.use("/", homeRouter);
 
 app.get("/", (req, res) => {
@@ -84,59 +91,45 @@ app.get("/", (req, res) => {
     });
   }
 });
-//app.get("/", isAuthenticated, (req, res) => {
-//});
-
-// function isAuthenticated(req, res, next) {
-//   console.log("isAuth function");
-//   if (req.session.uuid) next();
-//   else next("route");
-// }
 
 app.get("/leaderboard", (req, res) => {
-  googleController.getLeaderboard().then((data) => {
+  mongoController.loadLeaderBoard().then((data) => {
     if (req.session.uuid) {
       res.render("leaderboard", {
         customHead: leaderboardHead,
         navbar: navbarLoggedIn,
-        leaderboardData: data,
+        leaderboardData: JSON.stringify(data),
       });
     } else {
       res.render("leaderboard", {
         customHead: leaderboardHead,
         navbar: navbarLoggedOut,
-        leaderboardData: data,
+        leaderboardData: JSON.stringify(data),
       });
     }
   });
 });
 app.get("/gamesViewer", (req, res) => {
-  if (req.session.uuid) {
-    googleController.getGameStates().then((gameStates) => {
+  mongoController.loadAllGames().then((gameStates) => {
+    if (req.session.uuid) {
       res.render("gamesViewer", {
         customHead: gamesViewerHead,
         navbar: navbarLoggedIn,
         gameStates: gameStates,
       });
-    });
-  } else {
-    googleController.getGameStates().then((gameStates) => {
+    } else {
       res.render("gamesViewer", {
         customHead: gamesViewerHead,
         navbar: navbarLoggedOut,
         gameStates: gameStates,
       });
-    });
-  }
+    }
+  });
 });
 
 app.get("/magicLink", (req, res) => {
-  console.log("magic link");
-  let newGame = new Game();
-  newGame.loadGame(req.query.uuid).then(() => {
-    req.session.uuid = req.query.uuid;
-    res.redirect("/");
-  });
+  req.session.uuid = req.query.uuid;
+  res.redirect("/");
 });
 
 app.get("/logout", (req, res) => {
@@ -263,7 +256,7 @@ app.post("/download", (req, res) => {
 });
 
 app.get("/admin", (req, res) => {
-  googleController.getGameHints().then((gameHintsArr) => {
+  mongoController.loadGameStructures().then((gameHintsArr) => {
     if (req.session.uuid) {
       res.render("admin", {
         customHead: adminHead,

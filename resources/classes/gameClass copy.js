@@ -1,6 +1,7 @@
 const { google } = require("googleapis");
 const { v4: uuidv4 } = require("uuid");
-const googleController = require("./routes/Class_googleContoller.js");
+const googleController = require("../../routes/Class_googleContoller.js");
+const mongoController = require("./models/game.models.js");
 
 class Game {
   constructor(_teamName, _teamEmail, _puzzleCount) {

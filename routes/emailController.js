@@ -1,7 +1,6 @@
 const nodemailer = require("nodemailer");
 
 async function sendEmail(userInputs) {
-  console.log("userInputs: ", userInputs);
   let magicLink = "";
   if (userInputs.env == "production") {
     magicLink =
@@ -29,7 +28,7 @@ async function sendEmail(userInputs) {
   });
   let info = await transporter.sendMail({
     from: "forsy4444@msn.com", // sender address
-    to: userInputs.teamEmail, // list of receivers
+    to: userInputs.email, // list of receivers
     subject: "New Escape Room Submit", // Subject line
     text: emailText, // plain text body
   });

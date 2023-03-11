@@ -3,8 +3,13 @@ const router = express.Router();
 const { google } = require("googleapis");
 const { v4: uuidv4 } = require("uuid");
 const googleController = require("./googleContoller.js");
-const { Game, GameStructure, LeaderboardEntry } = require("../gameClass");
+const {
+  Game,
+  GameStructure,
+  LeaderboardEntry,
+} = require("../resources/classes/gameClass");
 const emailController = require("./emailController");
+const mongoController = require("../resources/mongoController.js");
 
 let googleCreds = "";
 if (process.env.NODE_ENV == "development") {
@@ -14,10 +19,11 @@ if (process.env.NODE_ENV == "development") {
 }
 
 let currentGames = [];
-googleController.getGameHints().then((data) => {
-  let parsedData = JSON.parse(data);
-  parsedData.forEach((game) => {
-    let gameStructure = new GameStructure(game);
+
+mongoController.loadGameStructures().then((data) => {
+  let gameStructures = data[0].gameStructure;
+  gameStructures.forEach((gameData) => {
+    let gameStructure = new GameStructure(gameData);
     currentGames.push(gameStructure);
   });
 });
@@ -26,7 +32,7 @@ router.post("/signUp", (req, res) => {
   if (req.body.teamName && req.body.email) {
     let game = new Game(
       req.body.teamName,
-      req.body.teamEmail,
+      req.body.email,
       currentGames[parseInt(req.body.gameNumber)].getClueCountArr()
     );
     game.startGame();
@@ -35,7 +41,7 @@ router.post("/signUp", (req, res) => {
       let msg = {};
       msg.uuid = game.uuid;
       msg.env = process.env.NODE_ENV;
-      msg.teamEmail = req.body.email;
+      msg.email = req.body.email;
       msg.teamName = req.body.teamName;
       emailController.sendEmail(msg);
     }
@@ -79,7 +85,6 @@ router.get("/clue", auth, (req, res) => {
 });
 
 router.post("/getHint", auth, (req, res) => {
-  console.log("getHint");
   let uuid = req.session.uuid;
   let gameId = parseInt(req.body.gameId);
   let puzzleNum = parseInt(req.body.puzzleNum);
@@ -89,12 +94,10 @@ router.post("/getHint", auth, (req, res) => {
       if (hintNum === "false") {
         res.send("false");
       } else {
-        googleController.getGameHints().then((data) => {
-          let parsedData = JSON.parse(data);
-          let gameStructure = new GameStructure(parsedData[gameId]);
-          let hint = gameStructure.getHint(puzzleNum - 1, hintNum - 1);
-          res.send(hint);
-        });
+        let gameStructure = new GameStructure(currentGames[gameId]);
+        let hint = gameStructure.getHint(puzzleNum - 1, hintNum - 1);
+        res.send(hint);
+        // });
       }
     });
   });
@@ -111,6 +114,7 @@ router.post("/gameEnd", auth, (req, res) => {
         res.send(finishResults);
       });
     });
+    //  });
   });
 });
 
