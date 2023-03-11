@@ -23,7 +23,6 @@ async function saveLeaderBoard(leaderBoardSave) {
 }
 async function loadLeaderBoard() {
   const result = await LeaderBoard.find({});
-  console.log("ack", result);
   return result[0].leaderBoard;
 }
 

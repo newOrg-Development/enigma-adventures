@@ -19,6 +19,10 @@ class Game {
     mongoController.saveGame(this).then(() => {});
   }
 
+  async saveGame() {
+    await mongoController.saveGame(this);
+  }
+
   async loadGame(uuid) {
     let loadedGame = await mongoController.loadGame(uuid);
     Object.keys(loadedGame).forEach((item) => {
@@ -34,6 +38,7 @@ class Game {
     if (this.finishTime === "running") {
       this.finishTime = "finished";
       this.finishTime = new Date().getTime();
+
       for (let i = 0; i < this.hintsAvailable.length; i++) {
         const el = Math.abs(
           (this.hintsAvailable[i] || 0) - (this.puzzleCount[i] || 0)

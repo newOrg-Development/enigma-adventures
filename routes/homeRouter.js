@@ -109,12 +109,12 @@ router.post("/gameEnd", auth, (req, res) => {
   finishedGame.loadGame(uuid).then(() => {
     let claimedFinishTime = req.body.timestamp; //in Case server lags
     finishedGame.endGame().then((finishResults) => {
+      finishedGame.saveGame();
       let leaderBoardCheck = new LeaderboardEntry(finishedGame);
       leaderBoardCheck.checkForLeader(finishResults).then(() => {
         res.send(finishResults);
       });
     });
-    //  });
   });
 });
 
